@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 public class MapFragment extends Fragment {
     private View view;
     private Context context;
-
+    //주우우우석!
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         context = getActivity();
