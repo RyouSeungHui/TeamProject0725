@@ -19,7 +19,7 @@ public class RandomFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         context = getActivity();
         view = inflater.inflate(R.layout.activity_random_fragment, container, false);
-
+        // 주석
         return view;
     }
 }
