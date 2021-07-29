@@ -3,15 +3,15 @@ package com.example.photosnsproject;
 public class User {
 
     private String id, password;
-    private String[] friendary= new String[100];
 
+    public User(){
 
+    }
 
     public User(String id, String password) {
         this.id = id;
         this.password = password;
 
-        for(int i=0; i<100; i++) this.friendary[i]="";
     }
 
     public String getId() {

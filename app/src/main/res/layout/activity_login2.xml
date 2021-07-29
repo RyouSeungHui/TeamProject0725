@@ -21,12 +21,14 @@
     <Button
         android:id="@+id/Login_btn_signin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:onClick="Login_signin"/>
 
     <Button
         android:id="@+id/Login_btn_login"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:onClick="Login_main"/>
 
 
 </LinearLayout>
