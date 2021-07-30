@@ -2,15 +2,25 @@ package com.example.photosnsproject;
 
 public class User {
 
-    private String id, password;
+    private String id, password,nick;
 
     public User(){
 
     }
 
-    public User(String id, String password) {
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public User(String id, String password, String nick) {
         this.id = id;
         this.password = password;
+        this.nick=nick;
+
 
     }
 

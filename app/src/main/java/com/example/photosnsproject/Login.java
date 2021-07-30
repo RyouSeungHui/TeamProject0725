@@ -46,6 +46,7 @@ public class Login extends AppCompatActivity {
         string_id=Login_id.getText().toString();
         string_pwd=Login_pwd.getText().toString();
 
+
         Intent intent=new Intent(this, MainActivity.class);
 
         db.child("Users").child(string_id).addValueEventListener(new ValueEventListener() { //addValue함수는 데이터베이스에 접근은 하는데 서버에 변화가 있으면 ValueEventListener 실행.
@@ -83,6 +84,8 @@ public class Login extends AppCompatActivity {
     {
         Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
     }
+
+
 
 
 }

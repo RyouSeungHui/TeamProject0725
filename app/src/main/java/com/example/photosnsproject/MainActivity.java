@@ -5,8 +5,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.view.ViewParent;
 
@@ -17,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private FriendsFragment friendsFragment;
     private MapFragment mapFragment;
     private MyFragment myFragment;
+    private ProfileFragment profileFragment;
     private RandomFragment randomFragment;
     private ViewPager viewPager;
 
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         mapFragment = new MapFragment();
         myFragment = new MyFragment();
         randomFragment = new RandomFragment();
+        profileFragment= new ProfileFragment();
+
 
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flFragment, friendsFragment).commitAllowingStateLoss();
@@ -77,4 +82,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void search(View view) {
+
+        Intent intent= new Intent(this,Search.class);
+        startActivityForResult(intent,1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                String id=data.getExtras().getString("id");
+                Bundle bundle = new Bundle(1);
+                bundle.putString("id",id);
+                profileFragment.setArguments(bundle);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flFragment, profileFragment).commitAllowingStateLoss();
+            }
+
+        }
+    }
 }
