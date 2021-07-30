@@ -11,17 +11,28 @@
     <EditText
         android:id="@+id/Signin_id"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:hint="아이디를 입력해주세요."/>
 
     <EditText
         android:id="@+id/Signin_pwd"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:hint="비밀번호를 입력해주세요."/>
+
+    <EditText
+        android:id="@+id/Signin_nick"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="닉네임을 입력해주세요."/>
+
+
 
     <Button
         android:id="@+id/Signin_btn_signin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="signin"/>
+        android:onClick="signin"
+        android:hint="회원가입"/>
 
 </LinearLayout>
