@@ -64,7 +64,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
 
         public SearchViewHolder(@NonNull View itemView) {
             super(itemView);
-
             this.search_text=itemView.findViewById(R.id.search_text);
             this.sp_linear1=itemView.findViewById(R.id.sp_linear1);
 

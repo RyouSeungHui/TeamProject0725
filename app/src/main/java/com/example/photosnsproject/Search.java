@@ -26,8 +26,8 @@ public class Search extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<User> list;
     private ArrayList<User> wholelist;
-    private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private DatabaseReference db = database.getReference();
+    private FirebaseDatabase database;
+    private DatabaseReference db;
     EditText search_edit;
 
     @Override
@@ -45,14 +45,16 @@ public class Search extends AppCompatActivity {
         wholelist=new ArrayList<>();
         adapter=new SearchAdapter(list, this);
         recyclerView.setAdapter(adapter);
-
-        db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+        database=FirebaseDatabase.getInstance();
+        db=database.getReference();
+        list.clear();
+        db.child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                wholelist.clear();
                 for (DataSnapshot sn : snapshot.getChildren()){
-                    User user = snapshot.getValue(User.class);
+                    User user = sn.getValue(User.class);
                     wholelist.add(user);
-
                 }
             }
 
@@ -90,13 +92,11 @@ public class Search extends AppCompatActivity {
     public void search_text(String s){
         list.clear();
         for(int i=0; i<wholelist.size(); i++){
+
             if(wholelist.get(i).getNick().contains(s)){
                 list.add(wholelist.get(i));
             }
-
         }
         adapter.notifyDataSetChanged(); //데이터 바뀐걸 어뎁터한테 알려줌.
-
-
     }
 }
