@@ -17,12 +17,12 @@ import java.util.ArrayList;
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> {
 
     private ArrayList<User> list;
-    private Context context;
+    private Context context; //무슨화면
 
-    public SearchAdapter( ArrayList<User> list, Context context){
+    public SearchAdapter( ArrayList<User> list, Context context){ //생성자
 
         this.list=list;
-        this.context=context;
+        this.context=context; //무슨 화면
     }
 
     @NonNull

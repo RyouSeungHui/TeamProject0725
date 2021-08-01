@@ -37,8 +37,7 @@ public class Search extends AppCompatActivity {
 
         search_edit=findViewById(R.id.search_edit);
         recyclerView=findViewById(R.id.search_rcy);
-
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true); //정리한번
         layoutManager= new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         list=new ArrayList<>();
@@ -48,6 +47,7 @@ public class Search extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         db=database.getReference();
         list.clear();
+
         db.child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
