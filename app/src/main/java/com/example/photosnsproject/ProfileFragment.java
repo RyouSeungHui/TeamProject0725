@@ -24,7 +24,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
         context = getActivity();
         view = inflater.inflate(R.layout.activity_profile_fragment, container, false);
-        pf_id=(TextView)view.findViewById(R.id.pf_id);
+        pf_id=(TextView)view.findViewById(R.id.pf_id); //2
         string_pf_id=getArguments().getString("id");
         pf_id.setText(string_pf_id);
 

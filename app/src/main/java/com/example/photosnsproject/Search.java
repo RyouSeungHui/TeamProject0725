@@ -53,7 +53,7 @@ public class Search extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 wholelist.clear();
                 for (DataSnapshot sn : snapshot.getChildren()){
-                    User user = sn.getValue(User.class);
+                    User user = sn.getValue(User.class); //1
                     wholelist.add(user);
                 }
             }
