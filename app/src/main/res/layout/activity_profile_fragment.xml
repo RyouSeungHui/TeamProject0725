@@ -12,11 +12,21 @@
         android:layout_height="wrap_content"/>
 
     <Button
-        android:id="@+id/follow_btn"
+        android:id="@+id/pf_follow_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="follow"
         android:text="팔로우"/>
 
+    <Button
+        android:id="@+id/pf_follower_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="팔로워"/>
+
+    <Button
+        android:id="@+id/pf_following_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="팔로잉"/>
 
 </LinearLayout>

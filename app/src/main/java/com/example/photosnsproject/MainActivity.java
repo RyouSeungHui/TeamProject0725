@@ -1,6 +1,7 @@
 package com.example.photosnsproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
@@ -104,5 +105,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    public void follow(Fragment fragment){
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.flFragment, fragment).commitAllowingStateLoss();
+
     }
 }

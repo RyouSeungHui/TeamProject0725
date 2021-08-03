@@ -58,6 +58,7 @@ public class Login extends AppCompatActivity {
                     User user = snapshot.getValue(User.class);
 
                     if (user.getPassword().equals(string_pwd)) {
+                        NowUser.id=string_id;
                         startActivity(intent);
                     } else {
                         sendmsg("비밀번호가 틀렸습니다.");
@@ -66,6 +67,7 @@ public class Login extends AppCompatActivity {
                 catch (NullPointerException e){
                     sendmsg("잘못된 아이디입니다.");
                 }
+
             }
             @Override
             //오류 생길때.
