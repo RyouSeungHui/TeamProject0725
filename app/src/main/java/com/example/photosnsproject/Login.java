@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -33,8 +34,6 @@ public class Login extends AppCompatActivity {
         Login_id=(EditText)findViewById(R.id.Login_id);
         Login_pwd=(EditText)findViewById(R.id.Login_pwd);
 
-
-
     }
 
     public void Login_signin(View view) {
@@ -58,7 +57,7 @@ public class Login extends AppCompatActivity {
                     User user = snapshot.getValue(User.class);
 
                     if (user.getPassword().equals(string_pwd)) {
-                        NowUser.id=string_id;
+                        PreferenceManager.setUserID(getApplicationContext(), string_id);
                         startActivity(intent);
                     } else {
                         sendmsg("비밀번호가 틀렸습니다.");
@@ -67,27 +66,16 @@ public class Login extends AppCompatActivity {
                 catch (NullPointerException e){
                     sendmsg("잘못된 아이디입니다.");
                 }
-
             }
             @Override
             //오류 생길때.
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-
         });
-
-
-
-
     }
-
     public void sendmsg(String s)
     {
         Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
     }
-
-
-
-
 }
