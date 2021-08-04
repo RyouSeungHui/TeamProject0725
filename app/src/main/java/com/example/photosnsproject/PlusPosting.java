@@ -295,7 +295,7 @@ public class PlusPosting extends AppCompatActivity {
         String userID = PreferenceManager.getUserId(getApplicationContext());
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("Users").child(userID).child("post").push();
-        PostItem postItem = new PostItem(strAddress, arrTag, selected);
+        PostItem postItem = new PostItem(strAddress, lati, longi, arrTag, selected);
         databaseReference.setValue(postItem);
 
         firebaseStorage = FirebaseStorage.getInstance();
