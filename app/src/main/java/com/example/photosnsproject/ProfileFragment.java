@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,7 +63,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.pf_follower_btn:
+                FollowFragment.userid=string_pf_id;
                 ((MainActivity)context).follow(FollowFragment.newInstance());
+                break;
 
         }
     }

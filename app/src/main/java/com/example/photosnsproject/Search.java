@@ -48,6 +48,7 @@ public class Search extends AppCompatActivity {
         db=database.getReference();
         list.clear();
 
+
         db.child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

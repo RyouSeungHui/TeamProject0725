@@ -34,7 +34,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.search_profile,parent,false);
         SearchAdapter.SearchViewHolder holder = new SearchAdapter.SearchViewHolder(view);
         return holder;
-    }
+    } //xml이랑 어뎁터랑 연결. 연결한것을 holder에 담음.  우리가 쓸수 있도록 onbind로 넘김.
 
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
@@ -45,7 +45,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
             public void onClick(View view) {
                 Intent intent=new Intent();
                 intent.putExtra("id", list.get(position).getId());
-                ((Activity)context).setResult(Activity.RESULT_OK,intent);
+                ((Activity)context).setResult(Activity.RESULT_OK,intent); //결과설정
                 ((Activity)context).finish();
 
             }
@@ -59,6 +59,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         return (list !=null ? list.size() : 0);
     }
 
+    //기능 설정
     public class SearchViewHolder extends RecyclerView.ViewHolder {
 
         TextView search_text;
