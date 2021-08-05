@@ -62,11 +62,29 @@ public class FollowFragment extends Fragment {
                 for (DataSnapshot sn : snapshot.getChildren()) {
                     String id = sn.getValue().toString();
                     list.add(id);
+
+                    db.child("Users").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            User user = snapshot.getValue(User.class);
+                            nick.add(user.getNick());
+                            adapter.notifyDataSetChanged();
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 }
 
+
+
+
             }
-
-
+            
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -75,26 +93,12 @@ public class FollowFragment extends Fragment {
 
         nick.clear();
 
-        for (int i = 0; i < list.size(); i++) {
-
-            db.child("Users").child(list.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                    User user = snapshot.getValue(User.class);
-                    nick.add(user.getNick());
-                    adapter.notifyDataSetChanged();
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
 
 
-        }
+
+
+
+
         return view;
     }
 }
