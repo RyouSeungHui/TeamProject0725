@@ -11,7 +11,7 @@ public class AutoLogin extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auto_login);
-        if(PreferenceManager.getUserId(getApplicationContext()).length()==0){
+        if(PreferenceManager.getUserId(getApplicationContext())==null){
             intent = new Intent(AutoLogin.this, Login.class);
             startActivity(intent);
             finish();
