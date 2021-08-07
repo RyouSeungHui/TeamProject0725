@@ -24,11 +24,11 @@ public class MyFragment extends Fragment {
         context = getActivity();
         view = inflater.inflate(R.layout.activity_my_fragment, container, false);
 
-        SetFloatingButton();
+        setFloatingButton();
         return view;
     }
 
-    private void SetFloatingButton() {
+    private void setFloatingButton() {
         FloatingActionButton fab = view.findViewById(R.id.btnPlus);
         fab.setOnClickListener(v -> {
             Intent intent = new Intent(context, PlusPosting.class);
