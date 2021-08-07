@@ -6,6 +6,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Context;
@@ -17,19 +19,28 @@ import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,7 +53,17 @@ public class MapFragment extends Fragment {
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
+
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+    private ArrayList<String> path;
+
+    private FirebaseDatabase database;
+    private DatabaseReference db;
+
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     public static MapFragment newInstance(){
         return new MapFragment();
@@ -62,17 +83,62 @@ public class MapFragment extends Fragment {
     private void init() {
         TextView tvMyGps = view.findViewById(R.id.tvMyGPS);
         ImageView btnRenew = view.findViewById(R.id.btnRenew);
+        EditText eddis = view.findViewById(R.id.ed_dis);
+
+        path=new ArrayList<>();
+
+        recyclerView = (view).findViewById(R.id.map_rcy);
+        recyclerView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new MappathAdapter(path,context);
+        recyclerView.setAdapter(adapter);
+
+        database=FirebaseDatabase.getInstance();
+        db=database.getReference();
+
         btnRenew.setOnClickListener(v -> {
             Animation anim = AnimationUtils.loadAnimation(context, R.anim.rotate_anim);
             btnRenew.startAnimation(anim);
             gpsTracker = new GpsTracker(context);
+
             latitude = gpsTracker.getLatitude();
             longitude = gpsTracker.getLongitude();
+            /*
+            광안리 해수욕장 위도,경도
+            latitude = 35.15439;
+            longitude = 129.12101;
+            */
+            eddis.setText("100");
+            Findphotobygps(latitude,longitude,100);
 
             String address = getCurrentAddress(latitude, longitude);
             tvMyGps.setText(address+" 근처의 인기 게시물이에요");
         });
+
         btnRenew.callOnClick();
+        eddis.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(eddis.getText().toString().equals(""))
+                {
+                    eddis.setText("0");
+                }
+                double dis = Double.parseDouble(eddis.getText().toString());
+                Findphotobygps(latitude,longitude,dis);
+            }
+        });
+
     }
 
     private void checkPermissions() {
@@ -193,4 +259,64 @@ public class MapFragment extends Fragment {
             }
         });
     }
+
+    private void Findphotobygps(double latitude, double longitude,double distance)
+    {
+        path.clear();
+        adapter.notifyDataSetChanged();
+        db.child("Users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                path.clear();
+                for(DataSnapshot usersnap : snapshot.getChildren())
+                {
+                    String userId = usersnap.getKey();
+                    db.child("Users").child(userId).child("post").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for(DataSnapshot postsnap : snapshot.getChildren())
+                            {
+                                PostItem post = postsnap.getValue(PostItem.class);
+                                String postId = postsnap.getKey();
+                                if(distance >= ruler(latitude,longitude,post.getLati(),post.getLongi()))
+                                {
+                                    path.add(userId+"/"+postId+".jpeg");
+                                    adapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private double ruler(double first_latitude,double first_longitude,double second_latitude,double second_longitude)
+    {
+        double distance=0.0;
+
+        double R = 6372.8;
+
+        double dLat = Math.toRadians(first_latitude-second_latitude);
+        double dLon = Math.toRadians(first_longitude-second_longitude);
+        double fr_latitude = Math.toRadians(first_latitude);
+        double sr_latitude = Math.toRadians(second_latitude);
+
+        double tempt = Math.pow(Math.sin(dLat/2),2)+Math.pow(Math.sin(dLon/2),2)*Math.cos(fr_latitude)*Math.cos(sr_latitude);
+        double c = 2*Math.asin(Math.sqrt(tempt));
+
+        distance = R*c*1000;
+
+        return distance;
+    }
+
 }
