@@ -41,9 +41,11 @@ public class Signin extends AppCompatActivity {
         string_nick=Sigin_nick.getText().toString();
 
 
-        User newuser = new User(string_id,string_pwd,string_nick);
+        User newuser = new User();
+
 
         db.child("Users").child(string_id).setValue(newuser); //id로 구분. setValue->정보 입력.
+
 
 
         Intent intent=new Intent(this, Login.class);

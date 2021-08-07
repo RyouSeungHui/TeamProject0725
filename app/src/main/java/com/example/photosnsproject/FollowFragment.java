@@ -37,6 +37,8 @@ public class FollowFragment extends Fragment {
         return new FollowFragment();
     }
 
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class FollowFragment extends Fragment {
         nick = new ArrayList<>();
         adapter = new FollowAdapter(nick, context);
         recyclerView.setAdapter(adapter);
+
 
 
         //Singlevalue로 고쳐봐라. 데이터 터짐.

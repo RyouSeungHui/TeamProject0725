@@ -49,7 +49,7 @@ public class Search extends AppCompatActivity {
         list.clear();
 
 
-        db.child("Users").addValueEventListener(new ValueEventListener() {
+        db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 wholelist.clear();
