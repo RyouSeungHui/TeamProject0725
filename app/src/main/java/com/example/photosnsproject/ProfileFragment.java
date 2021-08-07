@@ -10,8 +10,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,15 +43,22 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
+
     private View view;
     private Context context;
     private static final int IMAGE_REQUEST = 1;
     private Uri imageuri;
+    private Uri filePath;
     TextView pf_id;
     String string_pf_id;
     Button pf_follow_btn,pf_follower_btn,pf_following_btn;
@@ -57,6 +67,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference db = database.getReference();
     private FirebaseStorage storage=FirebaseStorage.getInstance();
+    private StorageReference storageReference=storage.getReference();
     private StorageTask uploadTask;
 
 
@@ -77,35 +88,29 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         pf_id.setText(string_pf_id);
 
 
+        StorageReference loadreference=storageReference.child("profile").child(string_pf_id+".png");
 
-        //프로필
-        db.child("Users").child(string_pf_id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user=snapshot.getValue(User.class);
+        //null이 인식이 안되는건가?
+        if(loadreference==null){
 
-                if(user.getProfileuri()==null){
+        }
+        else{
+            loadreference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Glide.with(getContext()).load(uri).into(profile);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
                     profile.setImageResource(R.mipmap.ic_launcher);
                 }
-                else{
-                    /*
-                    Activity activity = (Activity) view.getContext();
-                    if(activity.isFinishing()){
-                        return;
-                    }
-                     */
-                    Glide.with(view.getContext()).load(user.getProfileuri()).into(profile);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+            });
+        }
 
         return view;
     }
+
 
     private void setBottomSheetDialog(View view){
 
@@ -119,6 +124,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         LinearLayout bs1 = v.findViewById(R.id.bs1);
         LinearLayout bs2 = v.findViewById(R.id.bs2);
 
+        bottomSheetDialog.setContentView(v);
+        mBehavior = BottomSheetBehavior.from((View)v.getParent());
+        mBehavior.setPeekHeight(4000);
+        bottomSheetDialog.show();
+
         bs1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,10 +137,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        bottomSheetDialog.setContentView(v);
-        mBehavior = BottomSheetBehavior.from((View)v.getParent());
-        mBehavior.setPeekHeight(4000);
-        bottomSheetDialog.show();
+        bs2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StorageReference deletereference=storageReference.child("profile").child(string_pf_id+".png");
+                deletereference.delete();
+                bottomSheetDialog.dismiss();
+                profile.setImageResource(R.mipmap.ic_launcher);
+            }
+        });
+
+
 
 
 
@@ -143,121 +160,61 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         startActivityForResult(intent, IMAGE_REQUEST);
     }
 
-    private void uploadImage(){
-        final ProgressDialog progressDialog=new ProgressDialog(getContext());
-        progressDialog.setTitle("이미지 업로드");
-        progressDialog.show();
-
-        if(imageuri!=null){
-            StorageReference storageReference=storage.getReferenceFromUrl("gs://photosns-ac77b.appspot.com/");
-            final String profileimagename=System.currentTimeMillis()+"";
-
-            Uri file=imageuri;
-            final StorageReference riverRef=storageReference.child("profile/"+profileimagename);
-            UploadTask uploadTask=riverRef.putFile(file);
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    flag=1;
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getContext(), "업로드 실패", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                    progressDialog.setMessage("업로드 중..");
-                }
-            });
-
-            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-
-                    return riverRef.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if(task.isSuccessful() && flag == 1){
-                        Uri downloadUri = task.getResult();
-                        profileupdate(downloadUri.toString(), profileimagename);
-                        progressDialog.dismiss();
-                    }
-                }
-            });
-
-        }
-        else{
-            Toast.makeText(getContext(),"이미지를 선택해주세요",Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-    private void profileupdate(final String downloadUri, final String profileimagename){
-
-        db.child("Users").child(string_pf_id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user=snapshot.getValue(User.class);
-                user.setProfileimagename(profileimagename);
-                user.setProfileuri(downloadUri);
-                db.setValue(user);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==IMAGE_REQUEST && requestCode==RESULT_OK && data!=null && data.getData()!=null){
-            imageuri=data.getData();
+        if(requestCode == IMAGE_REQUEST && resultCode == RESULT_OK){
+            filePath = data.getData();
 
-            if(uploadTask != null && uploadTask.isInProgress()){
-                Toast.makeText(getContext(), "Upload in progress", Toast.LENGTH_SHORT).show();
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                uploadFile();
+                profile.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            else{
-
-                db.child("Users").child(string_pf_id).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        User user=snapshot.getValue(User.class);
-                        if(user.getProfileuri()==null){
-                            uploadImage();
-                        }
-                        else{
-                            StorageReference reference5 = FirebaseStorage.getInstance().getReferenceFromUrl("gs://photosns-ac77b.appspot.com/").child("profile").child(user.getProfileimagename());
-                            reference5.delete();
-                            uploadImage();
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
-
-
-
         }
     }
+
+    private void uploadFile() {
+
+        if (filePath != null) {
+            //원래있던거 지우기.
+            StorageReference uploadreference=storageReference.child("profile").child(string_pf_id+".png");
+            uploadreference.delete();
+            final ProgressDialog progressDialog = new ProgressDialog(getContext());
+            progressDialog.setTitle("업로드중...");
+            progressDialog.show();
+            uploadreference.putFile(filePath)
+
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
+                            Toast.makeText(getContext(), "업로드 완료!", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getContext(), "업로드 실패!", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                    @SuppressWarnings("VisibleForTests")
+                    double progress = (100 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                    progressDialog.setMessage("Uploaded " + ((int) progress) + "% ...");
+                }
+            });
+
+        } else {
+            Toast.makeText(getContext(), "파일을 먼저 선택하세요.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 
     @Override
     public void onClick(View view) {
