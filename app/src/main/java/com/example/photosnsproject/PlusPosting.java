@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -55,7 +56,7 @@ public class PlusPosting extends AppCompatActivity {
     private Button btnTag;
     private ArrayList<String> arrTag, arrFriend, selected;
     private String strTag, strFriend, strAddress;
-    private Float lati, longi;
+    private Float lati=0.0f, longi=0.0f;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private FirebaseStorage firebaseStorage;
@@ -69,6 +70,7 @@ public class PlusPosting extends AppCompatActivity {
         init();
     }
 
+    @SuppressLint("IntentReset")
     private void init() {
         //GET IMAGE
         imgPost = findViewById(R.id.imgPost);
@@ -275,7 +277,6 @@ public class PlusPosting extends AppCompatActivity {
         return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     private String getRealPathFromURI(Uri contentUri) {
         contentUri = MediaStore.setRequireOriginal(contentUri);
         int column_index=0;

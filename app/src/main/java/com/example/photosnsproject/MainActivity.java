@@ -110,6 +110,5 @@ public class MainActivity extends AppCompatActivity {
     public void follow(Fragment fragment){
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flFragment, fragment).commitAllowingStateLoss();
-
     }
 }
