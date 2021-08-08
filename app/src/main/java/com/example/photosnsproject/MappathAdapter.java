@@ -24,6 +24,10 @@ public class MappathAdapter extends RecyclerView.Adapter<MappathAdapter.pathHold
     ArrayList<String> path;
     Context context;
 
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+    private StorageReference submitProfile;
+
     public MappathAdapter(ArrayList<String> path, Context context) {
         this.path = path;
         this.context = context;
@@ -41,14 +45,13 @@ public class MappathAdapter extends RecyclerView.Adapter<MappathAdapter.pathHold
     public void onBindViewHolder(@NonNull pathHolder holder, int position) {
         holder.tv_path.setText(path.get(position));
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference();
-        StorageReference submitProfile = storageReference.child(path.get(position));
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        submitProfile = storageReference.child(path.get(position));
         submitProfile.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Glide.with(MapFragment.newInstance())
+                Glide.with(holder.map_img)
                         .load(uri)
                         .into(holder.map_img);
 
@@ -59,7 +62,6 @@ public class MappathAdapter extends RecyclerView.Adapter<MappathAdapter.pathHold
                 holder.tv_path.setText(""+e);
             }
         });
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     @Override

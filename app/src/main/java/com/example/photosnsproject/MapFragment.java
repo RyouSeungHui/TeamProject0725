@@ -104,11 +104,11 @@ public class MapFragment extends Fragment {
 
             latitude = gpsTracker.getLatitude();
             longitude = gpsTracker.getLongitude();
-            /*
-            광안리 해수욕장 위도,경도
+
+/*
             latitude = 35.15439;
             longitude = 129.12101;
-            */
+   */
             eddis.setText("100");
             Findphotobygps(latitude,longitude,100);
 
@@ -280,7 +280,7 @@ public class MapFragment extends Fragment {
                                 String postId = postsnap.getKey();
                                 if(distance >= ruler(latitude,longitude,post.getLati(),post.getLongi()))
                                 {
-                                    path.add(userId+"/"+postId+".jpeg");
+                                    path.add(userId+"/"+postId);
                                     adapter.notifyDataSetChanged();
                                 }
                             }
