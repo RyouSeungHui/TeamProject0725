@@ -101,6 +101,29 @@
                     android:id="@+id/spinFriend"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"/>
+
+                <TextView
+                    android:id="@+id/tvPublic"
+                    android:padding="5dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textColor="@color/black"
+                    android:text="공개 범위 설정" />
+
+                <Spinner
+                    android:id="@+id/spinPublic"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"/>
+
+                <EditText
+                    android:id="@+id/etContents"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textColor="@color/black"
+                    android:hint="내용 입력"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

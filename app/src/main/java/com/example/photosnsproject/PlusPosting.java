@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -44,18 +43,21 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PlusPosting extends AppCompatActivity {
     private ImageView imgPost;
     private static final int REQUEST_CODE = 0;
     private Spinner spinFriend;
-    private TextView tvTag, tvFriend, tvLocation;
+    private Spinner spinPublic;
+    private TextView tvTag, tvFriend, tvLocation, tvPublic;
     private EditText etTag;
     private Button btnTag;
-    private ArrayList<String> arrTag, arrFriend, selected;
-    private String strTag, strFriend, strAddress;
+    private ArrayList<String> arrTag, arrFriend, selected, arrPublic, selected2;
+    private String strTag, strFriend, strAddress, strPublic, strContents;
     private Float lati=0.0f, longi=0.0f;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -63,6 +65,7 @@ public class PlusPosting extends AppCompatActivity {
     private StorageReference storageReference;
     private Bitmap bitmap;
     private static final int PERMISSIONS_REQUEST=1;
+    private EditText etContents;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +73,6 @@ public class PlusPosting extends AppCompatActivity {
         init();
     }
 
-    @SuppressLint("IntentReset")
     private void init() {
         //GET IMAGE
         imgPost = findViewById(R.id.imgPost);
@@ -113,6 +115,19 @@ public class PlusPosting extends AppCompatActivity {
         arrFriend.add("이지훈");
         arrFriend.add("유승희");
 
+
+        //Public TAG
+        spinPublic = findViewById(R.id.spinPublic);
+        tvPublic = findViewById(R.id.tvPublic);
+        strPublic="";
+        arrPublic = new ArrayList<>();
+        selected2 = new ArrayList<>();
+
+        arrPublic.add("공개 범위");
+        arrPublic.add("전체 공개");
+        arrPublic.add("친구만 공개");
+        arrPublic.add("비공개");
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, arrFriend);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -131,11 +146,32 @@ public class PlusPosting extends AppCompatActivity {
 
             }
         });
+
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, arrPublic);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinPublic.setAdapter(adapter2);
+        spinPublic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position!=0){
+                    selected2.add(arrPublic.get(position));
+                    strPublic=arrPublic.get(position);
+                    tvPublic.setText(strPublic);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
+
+
 
     private void onCheckPermission() {
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED
-        ||ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+                ||ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)){
                 Toast.makeText(this, "사진 업로드를 위해서는 권한 설정이 필요합니다", Toast.LENGTH_LONG).show();
                 ActivityCompat.requestPermissions(this,
@@ -152,12 +188,12 @@ public class PlusPosting extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
             case PERMISSIONS_REQUEST:
-                    if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                        Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();
-                    }else{
-                        Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();
-                    }
-                    break;
+                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();
+                }
+                break;
         }
     }
 
@@ -277,6 +313,16 @@ public class PlusPosting extends AppCompatActivity {
         return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
     }
 
+    private String getTime() {
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        String getTime = dateFormat.format(date);
+
+        return getTime;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private String getRealPathFromURI(Uri contentUri) {
         contentUri = MediaStore.setRequireOriginal(contentUri);
         int column_index=0;
@@ -294,13 +340,22 @@ public class PlusPosting extends AppCompatActivity {
 
     public void onClickOkay(View view) {
         String userID = PreferenceManager.getUserId(getApplicationContext());
+
+        // 내용 입력
+        etContents = (EditText)findViewById(R.id.etContents);
+        strContents = etContents.getText().toString();
+
+
+        //파이어베이스 데이터베이스 연동
         firebaseDatabase = FirebaseDatabase.getInstance();
+
+        //DatabaseReference는 데이터베이스의 특정 위치로 연결
         databaseReference = firebaseDatabase.getReference("Users").child(userID).child("post").push();
-        PostItem postItem = new PostItem(strAddress, lati, longi, arrTag, selected);
+        PostItem postItem = new PostItem(strAddress, lati, longi, arrTag, selected, selected2, strContents, getTime());
         databaseReference.setValue(postItem);
 
         firebaseStorage = FirebaseStorage.getInstance();
-        storageReference = firebaseStorage.getReference().child(userID).child(databaseReference.getKey());
+        storageReference = firebaseStorage  .getReference().child(userID).child(databaseReference.getKey());
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] data = baos.toByteArray();

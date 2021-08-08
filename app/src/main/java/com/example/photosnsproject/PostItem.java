@@ -5,16 +5,20 @@ import java.util.ArrayList;
 public class PostItem {
     public String location;
     public float lati, longi;
-    public ArrayList<String> tag, friend;
+    public ArrayList<String> tag, friend, arrpublic;
+    public String contents, getTime;
 
     public PostItem() {}
 
-    public PostItem(String location, float lati, float longi, ArrayList<String> tag, ArrayList<String> friend) {
+    public PostItem(String location, float lati, float longi, ArrayList<String> tag, ArrayList<String> friend, ArrayList<String> arrpublic, String contents, String getTime) {
         this.location = location;
         this.lati = lati;
         this.longi = longi;
         this.tag = tag;
         this.friend = friend;
+        this.arrpublic = arrpublic;
+        this.contents = contents;
+        this.getTime= getTime;
     }
 
     public String getLocation() {
