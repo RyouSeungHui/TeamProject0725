@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
@@ -38,6 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -45,6 +48,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -57,18 +61,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private View view;
     private Context context;
     private static final int IMAGE_REQUEST = 1;
-    private Uri imageuri;
     private Uri filePath;
-    TextView pf_id;
-    String string_pf_id;
-    Button pf_follow_btn,pf_follower_btn,pf_following_btn;
-    CircleImageView profile;
-    int flag=-1;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference db = database.getReference();
     private FirebaseStorage storage=FirebaseStorage.getInstance();
     private StorageReference storageReference=storage.getReference();
-    private StorageTask uploadTask;
+    TextView pf_id;
+    String string_pf_id;
+    Button pf_follow_btn,pf_follower_btn,pf_following_btn;
+    CircleImageView profile;
+    private ArrayList<String> imagelist;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
+
+
 
 
     @Override
@@ -86,8 +93,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         pf_following_btn.setOnClickListener(this);
         profile.setOnClickListener(this);
         pf_id.setText(string_pf_id);
+        recyclerView = (view).findViewById(R.id.myprofile_rcy);
+        recyclerView.setHasFixedSize(true); //정리한번
+        layoutManager = new GridLayoutManager(view.getContext(),3);
+        recyclerView.setLayoutManager(layoutManager);
+        imagelist = new ArrayList<>();
+        adapter = new GalleryAdapter(imagelist, context);
+        recyclerView.setAdapter(adapter);
 
 
+
+        //프로필
         StorageReference loadreference=storageReference.child("profile").child(string_pf_id+".png");
 
         //null이 인식이 안되는건가?
@@ -108,10 +124,33 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             });
         }
 
+        //https://www.geeksforgeeks.org/how-to-view-all-the-uploaded-images-in-firebase-storage/
+        //자기 프로필 게시물
+        StorageReference mgreference=storageReference.child(string_pf_id);
+
+        mgreference.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                    @Override
+                    public void onSuccess(ListResult listResult) {
+                        for (StorageReference item : listResult.getItems()) {
+                            item.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    imagelist.add(uri.toString());
+                                    adapter.notifyDataSetChanged();
+                                    Log.e("Itemvalue",uri.toString());
+                                }
+                            });
+
+                        }
+                    }
+                });
+
+
         return view;
     }
 
 
+    //바텀다이어로그
     private void setBottomSheetDialog(View view){
 
         BottomSheetBehavior mBehavior;
@@ -153,6 +192,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    //갤러리드가기
     public void openImage(){
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_GET_CONTENT);

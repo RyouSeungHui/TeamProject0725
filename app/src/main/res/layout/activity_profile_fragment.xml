@@ -81,5 +81,10 @@
             android:layout_height="wrap_content"
             android:text="팔로우"/>
     </LinearLayout>
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/myprofile_rcy"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
