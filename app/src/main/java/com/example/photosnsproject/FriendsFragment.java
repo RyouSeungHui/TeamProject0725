@@ -60,7 +60,7 @@ public class FriendsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         String user=NowUser.id;
-        /*
+
         db.child("Follow").child("Following").child(user).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -86,7 +86,7 @@ public class FriendsFragment extends Fragment {
 
             }
         });
-        */
+
 
     }
 }

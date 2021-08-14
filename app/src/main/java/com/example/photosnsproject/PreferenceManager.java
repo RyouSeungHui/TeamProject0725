@@ -22,6 +22,7 @@ public class PreferenceManager {
     public static String getUserId(Context context){
         SharedPreferences sharedPreferences = getPreferences(context);
         String userID = sharedPreferences.getString(USER_ID, null);
+        NowUser.id=userID;
         return userID;
     }
 }
