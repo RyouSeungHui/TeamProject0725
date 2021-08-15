@@ -74,6 +74,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+    private String userID;
 
 
 
@@ -99,6 +100,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         imagelist = new ArrayList<>();
         adapter = new GalleryAdapter(imagelist, context);
         recyclerView.setAdapter(adapter);
+        userID =PreferenceManager.getUserId(view.getContext());
 
 
 
@@ -157,12 +159,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         switch (view.getId()) {
 
             case R.id.pf_follow_btn :
-                db.child("Follow").child("Follower").child(string_pf_id).push().setValue(NowUser.id);
-                db.child("Follow").child("Following").child(NowUser.id).push().setValue(string_pf_id);
+                db.child("Follow").child("Follower").child(string_pf_id).push().setValue(userID);
+                db.child("Follow").child("Following").child(userID).push().setValue(string_pf_id);
                 break;
 
             case R.id.pf_follower_btn:
-                FollowFragment.userid=string_pf_id;
                 ((MainActivity)context).follow(FollowFragment.newInstance());
                 break;
 

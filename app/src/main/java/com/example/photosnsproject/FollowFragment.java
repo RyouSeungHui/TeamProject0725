@@ -31,8 +31,7 @@ public class FollowFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<String> list;
     private ArrayList<String> nick;
-    public static String userid;
-
+    private String userID;
     public static FollowFragment newInstance() {
         return new FollowFragment();
     }
@@ -53,11 +52,12 @@ public class FollowFragment extends Fragment {
         nick = new ArrayList<>();
         adapter = new FollowAdapter(nick, context);
         recyclerView.setAdapter(adapter);
+        userID =PreferenceManager.getUserId(view.getContext());
 
 
 
         //Singlevalue로 고쳐봐라. 데이터 터짐.
-        db.child("Follow").child("Follower").child(userid).addListenerForSingleValueEvent(new ValueEventListener() {
+        db.child("Follow").child("Follower").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
