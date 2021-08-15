@@ -2,5 +2,5 @@ package com.example.photosnsproject;
 
 public class NowUser {
 
-    public static String id;
+    public static String id="dd";
 }
