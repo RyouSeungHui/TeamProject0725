@@ -64,7 +64,8 @@ public class PlusPosting extends AppCompatActivity {
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private Bitmap bitmap;
-    private static final int PERMISSIONS_REQUEST=1;
+    private static final int PERMISSIONS_REQUEST_1=1;
+    private static final int PERMISSIONS_REQUEST_2=2;
     private EditText etContents;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,18 +168,14 @@ public class PlusPosting extends AppCompatActivity {
         });
     }
 
-
-
     private void onCheckPermission() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED
-                ||ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)){
-                Toast.makeText(this, "사진 업로드를 위해서는 권한 설정이 필요합니다", Toast.LENGTH_LONG).show();
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_MEDIA_LOCATION}, PERMISSIONS_REQUEST);
-            }else{
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_MEDIA_LOCATION}, PERMISSIONS_REQUEST);
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this, "사진 업로드를 위해서는 권한 설정이 필요합니다", Toast.LENGTH_LONG).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_1);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, PERMISSIONS_REQUEST_2);
             }
         }
     }
@@ -187,17 +184,25 @@ public class PlusPosting extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
-            case PERMISSIONS_REQUEST:
+            case PERMISSIONS_REQUEST_1:
                 if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
                     Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();
                 }else{
                     Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case PERMISSIONS_REQUEST_2:
+                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
+                    if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                        Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -216,9 +221,14 @@ public class PlusPosting extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void getGPS(Uri imgUri) {
-        String imagePath = getRealPathFromURI(imgUri);
+        String imagePath = "";
+        if(Build.VERSION.SDK_INT>=29) {
+            imagePath = getRealPathFromURI(imgUri);
+        }
+        else{
+            imagePath = getPathFromURI(imgUri);
+        }
         ExifInterface exif = null;
         try {
             exif = new ExifInterface(imagePath);
@@ -234,7 +244,7 @@ public class PlusPosting extends AppCompatActivity {
         String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
         String longitudeRef = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
 
-        if((latitude!=null) && (latitudeRef!=null)&&(longitude!=null)&&(latitudeRef!=null)){
+        if((latitude!=null) && (latitudeRef!=null)&&(longitude!=null)&&(longitudeRef!=null)){
             if(latitudeRef.equals("N")) lati = convertToDegree(latitude);
             else lati = 0-convertToDegree(latitude);
 
@@ -246,6 +256,15 @@ public class PlusPosting extends AppCompatActivity {
 
         bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환
         imgPost.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
+    }
+
+    private String getPathFromURI(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        startManagingCursor(cursor);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 
     private String getCurrentAddress(Float lati, Float longi) {
@@ -273,7 +292,7 @@ public class PlusPosting extends AppCompatActivity {
                 return address.getAddressLine(0);
             }
         }
-        return "";
+        return "위치 정보 없음";
     }
 
     private Float convertToDegree(String stringDMS) {
@@ -322,9 +341,10 @@ public class PlusPosting extends AppCompatActivity {
         return getTime;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     private String getRealPathFromURI(Uri contentUri) {
-        contentUri = MediaStore.setRequireOriginal(contentUri);
+        if(Build.VERSION.SDK_INT>=29) {
+            contentUri = MediaStore.setRequireOriginal(contentUri);
+        }
         int column_index=0;
         String[] proj = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
@@ -366,5 +386,7 @@ public class PlusPosting extends AppCompatActivity {
         }).addOnSuccessListener(taskSnapshot -> {
             Toast.makeText(getApplicationContext(), "게시물 작성 성공", Toast.LENGTH_LONG).show();
         });
+
+        finish();
     }
 }
