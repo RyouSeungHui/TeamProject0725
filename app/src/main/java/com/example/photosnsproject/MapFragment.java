@@ -56,7 +56,7 @@ public class MapFragment extends Fragment {
 
     String[] REQUIRED_PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
-    private ArrayList<String> path;
+    private ArrayList<String> path, postLoc;
 
     private FirebaseDatabase database;
     private DatabaseReference db;
@@ -86,6 +86,7 @@ public class MapFragment extends Fragment {
         EditText eddis = view.findViewById(R.id.ed_dis);
 
         path=new ArrayList<>();
+        postLoc = new ArrayList<>();
 
         recyclerView = (view).findViewById(R.id.map_rcy);
         recyclerView.setHasFixedSize(true);
@@ -253,6 +254,8 @@ public class MapFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putDouble("latitude", latitude);
                 bundle.putDouble("longitude", longitude);
+                bundle.putStringArrayList("path", path);
+                bundle.putStringArrayList("postLoc", postLoc);
                 SubMapFragment subMapFragment = SubMapFragment.newInstance();
                 subMapFragment.setArguments(bundle);
                 ((MainActivity)getActivity()).follow(subMapFragment);
@@ -263,11 +266,13 @@ public class MapFragment extends Fragment {
     private void Findphotobygps(double latitude, double longitude,double distance)
     {
         path.clear();
+        postLoc.clear();
         adapter.notifyDataSetChanged();
         db.child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 path.clear();
+                postLoc.clear();
                 for(DataSnapshot usersnap : snapshot.getChildren())
                 {
                     String userId = usersnap.getKey();
@@ -281,6 +286,7 @@ public class MapFragment extends Fragment {
                                 if(distance >= ruler(latitude,longitude,post.getLati(),post.getLongi()))
                                 {
                                     path.add(userId+"/"+postId);
+                                    postLoc.add(post.getLati()+"/"+post.getLongi());
                                     adapter.notifyDataSetChanged();
                                 }
                             }
