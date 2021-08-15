@@ -1,6 +1,7 @@
 package com.example.photosnsproject;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -18,6 +22,8 @@ import java.util.ArrayList;
 public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postviewholder>{
 
     ArrayList<PostItem> posting;
+    ArrayList<String> postname;
+    ArrayList<String> postuser;
     Context context;
 
     private FirebaseStorage storage;
@@ -25,9 +31,11 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
     private StorageReference submitProfile;
 
 
-    public PostingAdapter(ArrayList<PostItem> posting, Context context) {
+    public PostingAdapter(ArrayList<PostItem> posting, Context context,ArrayList<String> postname,ArrayList<String> postuser) {
         this.posting = posting;
         this.context = context;
+        this.postname=postname;
+        this.postuser=postuser;
     }
 
 
@@ -41,6 +49,25 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
 
     @Override
     public void onBindViewHolder(@NonNull PostingAdapter.postviewholder holder, int position) {
+        holder.user_name.setText(postuser.get(position));
+
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        String path = postuser.get(position)+"/"+postname.get(position);
+        submitProfile = storageReference.child(path);
+        submitProfile.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(holder.post_img)
+                        .load(uri)
+                        .into(holder.post_img);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
 
     }
 

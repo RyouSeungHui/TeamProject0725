@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +27,8 @@ public class FriendsFragment extends Fragment {
     private Context context;
 
     private ArrayList<PostItem> posting;
+    private ArrayList<String> postname;
+    private ArrayList<String> postuser;
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -33,6 +36,8 @@ public class FriendsFragment extends Fragment {
 
     private FirebaseDatabase database;
     private DatabaseReference db;
+
+    private TextView test;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
@@ -47,6 +52,10 @@ public class FriendsFragment extends Fragment {
     private void init() {
 
         posting = new ArrayList<>();
+        postname = new ArrayList<>();
+        postuser = new ArrayList<>();
+
+        test = (view).findViewById(R.id.textView);
 
         database=FirebaseDatabase.getInstance();
         db=database.getReference();
@@ -56,23 +65,33 @@ public class FriendsFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new PostingAdapter(posting,context);
+        adapter = new PostingAdapter(posting,context,postname,postuser);
         recyclerView.setAdapter(adapter);
 
         String user=NowUser.id;
 
+        test.setText(user);
+
         db.child("Follow").child("Following").child(user).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                posting.clear();
+                postname.clear();
+                postuser.clear();
                 for(DataSnapshot sn : snapshot.getChildren())
                 {
                     String followname = sn.getValue(String.class);
                     db.child("Users").child(followname).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-
+                            for(DataSnapshot itemsn : snapshot.getChildren()) {
+                                PostItem item = itemsn.getValue(PostItem.class);
+                                postuser.add(followname);
+                                posting.add(item);
+                                postname.add(itemsn.getKey());
+                                adapter.notifyDataSetChanged();
+                            }
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
 

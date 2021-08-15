@@ -58,6 +58,7 @@ public class Login extends AppCompatActivity {
 
                     if (user.getPassword().equals(string_pwd)) {
                         PreferenceManager.setUserID(getApplicationContext(), string_id);
+
                         startActivity(intent);
                     } else {
                         sendmsg("비밀번호가 틀렸습니다.");
