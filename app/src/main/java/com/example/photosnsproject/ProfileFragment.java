@@ -91,7 +91,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         pf_follow_btn.setOnClickListener(this);
         pf_follower_btn.setOnClickListener(this);
         pf_following_btn.setOnClickListener(this);
-        profile.setOnClickListener(this);
         pf_id.setText(string_pf_id);
         recyclerView = (view).findViewById(R.id.myprofile_rcy);
         recyclerView.setHasFixedSize(true); //정리한번
@@ -150,110 +149,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    //바텀다이어로그
-    private void setBottomSheetDialog(View view){
-
-        BottomSheetBehavior mBehavior;
-        View v;
-
-        final BottomSheetDialog bottomSheetDialog=new BottomSheetDialog(view.getContext());
-        v= LayoutInflater.from(getContext()).inflate(R.layout.layout_bottomsheetdialog_profile,(LinearLayout)view.findViewById(R.id.bottomSheetContainer));
-
-
-        LinearLayout bs1 = v.findViewById(R.id.bs1);
-        LinearLayout bs2 = v.findViewById(R.id.bs2);
-
-        bottomSheetDialog.setContentView(v);
-        mBehavior = BottomSheetBehavior.from((View)v.getParent());
-        mBehavior.setPeekHeight(4000);
-        bottomSheetDialog.show();
-
-        bs1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                openImage();
-                bottomSheetDialog.dismiss();
-            }
-        });
-
-        bs2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                StorageReference deletereference=storageReference.child("profile").child(string_pf_id+".png");
-                deletereference.delete();
-                bottomSheetDialog.dismiss();
-                profile.setImageResource(R.mipmap.ic_launcher);
-            }
-        });
-
-
-
-
-
-    }
-
-    //갤러리드가기
-    public void openImage(){
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, IMAGE_REQUEST);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == IMAGE_REQUEST && resultCode == RESULT_OK){
-            filePath = data.getData();
-
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
-                uploadFile();
-                profile.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void uploadFile() {
-
-        if (filePath != null) {
-            //원래있던거 지우기.
-            StorageReference uploadreference=storageReference.child("profile").child(string_pf_id+".png");
-            uploadreference.delete();
-            final ProgressDialog progressDialog = new ProgressDialog(getContext());
-            progressDialog.setTitle("업로드중...");
-            progressDialog.show();
-            uploadreference.putFile(filePath)
-
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressDialog.dismiss(); //업로드 진행 Dialog 상자 닫기
-                            Toast.makeText(getContext(), "업로드 완료!", Toast.LENGTH_SHORT).show();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    progressDialog.dismiss();
-                    Toast.makeText(getContext(), "업로드 실패!", Toast.LENGTH_SHORT).show();
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                    @SuppressWarnings("VisibleForTests")
-                    double progress = (100 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                    progressDialog.setMessage("Uploaded " + ((int) progress) + "% ...");
-                }
-            });
-
-        } else {
-            Toast.makeText(getContext(), "파일을 먼저 선택하세요.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
 
     @Override
@@ -271,9 +166,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 ((MainActivity)context).follow(FollowFragment.newInstance());
                 break;
 
-            case R.id.profile:
-                setBottomSheetDialog(view);
-                break;
+
 
         }
     }

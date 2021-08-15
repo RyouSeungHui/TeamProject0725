@@ -46,8 +46,8 @@ public class Search extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         database=FirebaseDatabase.getInstance();
         db=database.getReference();
-        list.clear();
 
+        list.clear();
 
         db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

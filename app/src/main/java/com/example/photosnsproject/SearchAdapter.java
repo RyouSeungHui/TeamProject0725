@@ -40,6 +40,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
 
         holder.search_text.setText(list.get(position).getNick());
+
         holder.sp_linear1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
