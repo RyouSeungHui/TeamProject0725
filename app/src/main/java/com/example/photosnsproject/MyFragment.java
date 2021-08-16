@@ -2,7 +2,6 @@ package com.example.photosnsproject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,8 +26,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.OnProgressListener;
@@ -97,6 +99,69 @@ public class MyFragment extends Fragment implements View.OnClickListener {
         adapter = new GalleryAdapter(imagelist, context);
         recyclerView.setAdapter(adapter);
         mf_id.setText(userID);
+
+        //팔로워
+        db.child("Follow").child("Follower").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int cnt=0;
+                for(DataSnapshot snapshot1: snapshot.getChildren()){
+                    if(snapshot1 !=null){
+                        cnt++;
+                    }
+                }
+                num_follower.setText(cnt+"");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //팔로우
+        db.child("Follow").child("Following").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int cnt=0;
+                for(DataSnapshot snapshot1: snapshot.getChildren()){
+                    if(snapshot1 !=null){
+                        cnt++;
+                    }
+                }
+                num_following.setText(cnt+"");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //게시물
+        db.child("Users").child(userID).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int cnt=0;
+                for(DataSnapshot snapshot1: snapshot.getChildren()){
+                    if(snapshot1 !=null){
+                        cnt++;
+                    }
+                }
+                num_gallery.setText(cnt+"");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
 
 
         StorageReference loadreference=storageReference.child("profile").child(userID+".png");
@@ -261,6 +326,15 @@ public class MyFragment extends Fragment implements View.OnClickListener {
 
             case R.id.profile:
                 setBottomSheetDialog(view);
+                break;
+
+
+            case R.id.mf_follower:
+                ((MainActivity)context).follow(FollowerFragment.newInstance());
+                break;
+
+            case R.id.mf_following:
+                ((MainActivity)context).follow(FollowingFragment.newInstance());
                 break;
 
         }
