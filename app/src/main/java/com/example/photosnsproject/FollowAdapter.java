@@ -36,6 +36,8 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
     private FirebaseStorage storage=FirebaseStorage.getInstance();
     private StorageReference storageReference=storage.getReference();
 
+    private ProfileFragment profileFragment=new ProfileFragment();
+
 
     public FollowAdapter( ArrayList<String> nicklist, ArrayList<String> idlist, Context context){
 
@@ -71,8 +73,18 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
             }
         });
 
-    }
+        holder.fp_linear1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String id = idlist.get(position);
+                Bundle bundle = new Bundle(1);
+                bundle.putString("id",id);
+                profileFragment.setArguments(bundle);
+                ((MainActivity)context).follow(profileFragment);
+            }
+        });
 
+    }
     @Override
     public int getItemCount() {
 
@@ -93,23 +105,6 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
             this.followlist_id=itemView.findViewById(R.id.followlist_id);
             this.followlist_profile=itemView.findViewById(R.id.followlist_profile);
 
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                   /* final int pos=getAdapterPosition();
-                    Intent intent=new Intent(view.getContext(), ProfileFragment.class);
-                    intent.putExtra("id",idlist.get(pos));
-                    view.getContext().startActivity(intent);*/
-
-                    ProfileFragment profileFragment = new ProfileFragment();
-                    final int pos=getAdapterPosition();
-                    Bundle bundle = new Bundle(1);
-                    bundle.putString("id",idlist.get(pos));
-                    profileFragment.setArguments(bundle);
-                    ((MainActivity)context).follow(profileFragment.newInstance());
-                }
-            });
         }
     }
 }

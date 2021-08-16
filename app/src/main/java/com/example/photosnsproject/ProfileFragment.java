@@ -146,8 +146,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 ((MainActivity)context).follow(FollowerFragment.newInstance());
                 break;
 
-
-
         }
     }
 }
