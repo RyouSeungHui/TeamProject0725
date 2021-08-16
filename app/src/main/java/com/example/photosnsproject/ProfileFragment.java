@@ -32,6 +32,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
+    private static final String TAG = "";
     private View view;
     private Context context;
     private static final int IMAGE_REQUEST = 1;
@@ -51,12 +52,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private String userID;
 
 
-
+    public static ProfileFragment newInstance() {
+        return new ProfileFragment();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = getActivity();
         view = inflater.inflate(R.layout.activity_profile_fragment, container, false);
+
+
         profile=view.findViewById(R.id.profile);
         pf_id = (TextView) view.findViewById(R.id.pf_id); //2
         string_pf_id = getArguments().getString("id");

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +13,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.core.persistence.PruneForest;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -30,6 +35,7 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
     private Context context;
     private FirebaseStorage storage=FirebaseStorage.getInstance();
     private StorageReference storageReference=storage.getReference();
+
 
     public FollowAdapter( ArrayList<String> nicklist, ArrayList<String> idlist, Context context){
 
@@ -64,17 +70,7 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
                 holder.followlist_profile.setImageResource(R.mipmap.ic_launcher);
             }
         });
-        /*
-        holder.fp_linear1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent();
-                intent.putExtra("id", list.get(position).getId());
-                ((Activity)context).setResult(Activity.RESULT_OK,intent); //결과설정
-                ((Activity)context).finish();
 
-            }
-        });*/
     }
 
     @Override
@@ -96,6 +92,24 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
             this.fp_linear1=itemView.findViewById(R.id.fp_linear1);
             this.followlist_id=itemView.findViewById(R.id.followlist_id);
             this.followlist_profile=itemView.findViewById(R.id.followlist_profile);
+
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                   /* final int pos=getAdapterPosition();
+                    Intent intent=new Intent(view.getContext(), ProfileFragment.class);
+                    intent.putExtra("id",idlist.get(pos));
+                    view.getContext().startActivity(intent);*/
+
+                    ProfileFragment profileFragment = new ProfileFragment();
+                    final int pos=getAdapterPosition();
+                    Bundle bundle = new Bundle(1);
+                    bundle.putString("id",idlist.get(pos));
+                    profileFragment.setArguments(bundle);
+                    ((MainActivity)context).follow(profileFragment.newInstance());
+                }
+            });
         }
     }
 }

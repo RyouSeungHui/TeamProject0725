@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,6 +35,8 @@ public class FollowingFragment extends Fragment {
     private ArrayList<String> nicklist;
     private ArrayList<String> idlist;
 
+    private ProfileFragment profileFragment;
+
     private String userID;
     public static FollowingFragment newInstance() {
         return new FollowingFragment();
@@ -56,10 +60,6 @@ public class FollowingFragment extends Fragment {
         adapter = new FollowAdapter(nicklist, idlist, context);
         recyclerView.setAdapter(adapter);
         userID =PreferenceManager.getUserId(view.getContext());
-
-
-
-
 
         //Singlevalue로 고쳐봐라. 데이터 터짐.
         db.child("Follow").child("Following").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -111,4 +111,14 @@ public class FollowingFragment extends Fragment {
 
         return view;
     }
+/*
+    public void showProfileFragment(String id) {
+        ProfileFragment profileFragment = new ProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("id",id);
+        profileFragment.setArguments(bundle);
+        ((MainActivity)context).follow(ProfileFragment.newInstance());
+    }
+
+ */
 }
