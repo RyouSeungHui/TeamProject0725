@@ -21,6 +21,30 @@ public class PostItem {
         this.getTime= getTime;
     }
 
+    public ArrayList<String> getArrpublic() {
+        return arrpublic;
+    }
+
+    public void setArrpublic(ArrayList<String> arrpublic) {
+        this.arrpublic = arrpublic;
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
+    }
+
+    public String getGetTime() {
+        return getTime;
+    }
+
+    public void setGetTime(String getTime) {
+        this.getTime = getTime;
+    }
+
     public String getLocation() {
         return location;
     }
