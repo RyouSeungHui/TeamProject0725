@@ -4,12 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        
+        android:orientation="vertical"
+        android:background="@drawable/itemborder">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -18,73 +19,152 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
-
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:clickable="true"/>
-
             </LinearLayout>
-            
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:padding="5dp"
                 android:layout_gravity="center">
-                
+
                 <LinearLayout
+                    android:id="@+id/pf_gallery"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="1">
-                <Button
-                    android:id="@+id/pf_follower_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="팔로워"/>
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/num_gallery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:gravity="center"
+                        android:text=""/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:gravity="center"
+                        android:text="게시물"/>
+
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/pf_follower"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="1">
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/pf_following_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="팔로잉"/>
+                    <TextView
+                        android:id="@+id/num_follower"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:gravity="center"
+                        android:text=""/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:gravity="center"
+                        android:text="팔로워"/>
 
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/pf_following"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/num_following"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:gravity="center"
+                        android:text=""/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+                        android:gravity="center"
+                        android:text="팔로잉"/>
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
+            z
+
         </LinearLayout>
+        
 
-        <TextView
-            android:id="@+id/pf_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="2">
+            <TextView
+                android:id="@+id/pf_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:layout_margin="10dp"
+                android:text="아이디"/>
 
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/pf_follow_btn"
-            android:layout_width="wrap_content"
+            </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="팔로우"/>
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/pf_follow_btn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/follow_btn"
+                android:layout_margin="15dp"
+                android:textColor="@color/white"
+                android:text="팔로우"/>
+
+        </LinearLayout>
+            
+
+
+
+  
+
+
     </LinearLayout>
-    
+
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/myprofile_rcy"
+        android:id="@+id/pf_rcy"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+
 
 </LinearLayout>

@@ -2,7 +2,7 @@ package com.example.photosnsproject;
 
 public class User {
 
-    private String id, password,nick,profileuri,profileimagename;
+    private String id, password,nick;
 
     public User(){
 
@@ -12,32 +12,16 @@ public class User {
         return nick;
     }
 
-    public String getProfileuri() {
-        return profileuri;
-    }
-
-    public void setProfileuri(String profileuri) {
-        this.profileuri = profileuri;
-    }
-
-    public String getProfileimagename() {
-        return profileimagename;
-    }
-
-    public void setProfileimagename(String profileimagename) {
-        this.profileimagename = profileimagename;
-    }
 
     public void setNick(String nick) {
         this.nick = nick;
     }
 
-    public User(String id, String password, String nick, String profileuri, String profileimagename) {
+    public User(String id, String password, String nick) {
         this.id = id;
         this.password = password;
         this.nick = nick;
-        this.profileuri = profileuri;
-        this.profileimagename = profileimagename;
+
     }
 
     public String getId() {

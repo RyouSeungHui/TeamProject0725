@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,13 +15,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
@@ -32,7 +37,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = "";
+
     private View view;
     private Context context;
     private static final int IMAGE_REQUEST = 1;
@@ -41,9 +46,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private DatabaseReference db = database.getReference();
     private FirebaseStorage storage=FirebaseStorage.getInstance();
     private StorageReference storageReference=storage.getReference();
-    TextView pf_id;
     String string_pf_id;
-    Button pf_follow_btn,pf_follower_btn,pf_following_btn;
+    private LinearLayout pf_gallery;
+    private LinearLayout pf_follower;
+    private LinearLayout pf_following;
+    private TextView pf_id;
+    private TextView num_gallery;
+    private TextView num_follower;
+    private TextView num_following;
+    private Button pf_follow_btn;
     CircleImageView profile;
     private ArrayList<String> imagelist;
     private RecyclerView recyclerView;
@@ -66,13 +77,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         pf_id = (TextView) view.findViewById(R.id.pf_id); //2
         string_pf_id = getArguments().getString("id");
         pf_follow_btn=(Button) view.findViewById(R.id.pf_follow_btn);
-        pf_follower_btn=(Button) view.findViewById(R.id.pf_follower_btn);
-        pf_following_btn=(Button) view.findViewById(R.id.pf_following_btn);
+        pf_gallery=(view).findViewById(R.id.pf_gallery);
+        pf_follower=(view).findViewById(R.id.pf_follower);
+        pf_following=(view).findViewById(R.id.pf_following);
+        num_gallery=view.findViewById(R.id.num_gallery);
+        num_follower=view.findViewById(R.id.num_follower);
+        num_following=view.findViewById(R.id.num_following);
         pf_follow_btn.setOnClickListener(this);
-        pf_follower_btn.setOnClickListener(this);
-        pf_following_btn.setOnClickListener(this);
+        pf_gallery.setOnClickListener(this);
+        pf_follower.setOnClickListener(this);
+        pf_following.setOnClickListener(this);
         pf_id.setText(string_pf_id);
-        recyclerView = (view).findViewById(R.id.myprofile_rcy);
+        recyclerView = (view).findViewById(R.id.pf_rcy);
         recyclerView.setHasFixedSize(true); //정리한번
         layoutManager = new GridLayoutManager(view.getContext(),3);
         recyclerView.setLayoutManager(layoutManager);
@@ -80,6 +96,67 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         adapter = new GalleryAdapter(imagelist, context);
         recyclerView.setAdapter(adapter);
         userID =PreferenceManager.getUserId(view.getContext());
+
+        //팔로워
+        db.child("Follow").child("Follower").child(string_pf_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int cnt=0;
+                for(DataSnapshot snapshot1: snapshot.getChildren()){
+                    if(snapshot1 !=null){
+                        cnt++;
+                    }
+                }
+                num_follower.setText(cnt+"");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //팔로우
+        db.child("Follow").child("Following").child(string_pf_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int cnt=0;
+                for(DataSnapshot snapshot1: snapshot.getChildren()){
+                    if(snapshot1 !=null){
+                        cnt++;
+                    }
+                }
+                num_following.setText(cnt+"");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //게시물
+        db.child("Users").child(string_pf_id).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int cnt=0;
+                for(DataSnapshot snapshot1: snapshot.getChildren()){
+                    if(snapshot1 !=null){
+                        cnt++;
+                    }
+                }
+                num_gallery.setText(cnt+"");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
 
 
@@ -125,9 +202,68 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     }
                 });
 
+        //팔로우 버튼
+
+        db.child("Follow").child("Following").child(userID).child(string_pf_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String item=snapshot.getValue(String.class);
+                if(item==null){
+
+                    pf_follow_btn.setBackgroundResource(R.drawable.follow_btn);
+                    pf_follow_btn.setTextColor(Color.WHITE);
+
+                }
+                else{
+                    pf_follow_btn.setBackgroundResource(R.drawable.after_follow_btn);
+                    pf_follow_btn.setTextColor(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         return view;
     }
+
+
+
+    //팔로우 버튼
+
+
+
+
+    public void follow_btn_click(){
+        db.child("Follow").child("Following").child(userID).child(string_pf_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String item=snapshot.getValue(String.class);
+                if(item==null){
+                    db.child("Follow").child("Follower").child(string_pf_id).child(userID).setValue(userID);
+                    db.child("Follow").child("Following").child(userID).child(string_pf_id).setValue(string_pf_id);
+                    pf_follow_btn.setBackgroundResource(R.drawable.after_follow_btn);
+                    pf_follow_btn.setTextColor(Color.BLACK);
+
+                }
+                else{
+                    db.child("Follow").child("Follower").child(string_pf_id).child(userID).removeValue();
+                    db.child("Follow").child("Following").child(userID).child(string_pf_id).removeValue();
+                    pf_follow_btn.setBackgroundResource(R.drawable.follow_btn);
+                    pf_follow_btn.setTextColor(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 
 
 
@@ -137,13 +273,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         switch (view.getId()) {
 
-            case R.id.pf_follow_btn :
-                db.child("Follow").child("Follower").child(string_pf_id).push().setValue(userID);
-                db.child("Follow").child("Following").child(userID).push().setValue(string_pf_id);
+            case R.id.pf_follow_btn :follow_btn_click();
                 break;
 
-            case R.id.pf_follower_btn:
+            case R.id.pf_follower:
                 ((MainActivity)context).follow(FollowerFragment.newInstance());
+                break;
+
+            case R.id.pf_following:
+                ((MainActivity)context).follow(FollowingFragment.newInstance());
                 break;
 
         }
