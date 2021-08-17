@@ -55,7 +55,7 @@ public class FollowerFragment extends Fragment {
         idlist = new ArrayList<>();
         adapter = new FollowAdapter(nicklist, idlist, context);
         recyclerView.setAdapter(adapter);
-        userID =PreferenceManager.getUserId(view.getContext());
+        userID= getArguments().getString("id");
 
 
 

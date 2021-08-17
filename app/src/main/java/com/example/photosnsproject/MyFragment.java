@@ -66,6 +66,9 @@ public class MyFragment extends Fragment implements View.OnClickListener {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private String userID;
+    private FollowerFragment followerFragment=new FollowerFragment();
+    private FollowingFragment followingFragment=new FollowingFragment();
+
 
 
 
@@ -330,11 +333,19 @@ public class MyFragment extends Fragment implements View.OnClickListener {
 
 
             case R.id.mf_follower:
-                ((MainActivity)context).follow(FollowerFragment.newInstance());
+                String id1 = userID;
+                Bundle bundle1 = new Bundle(1);
+                bundle1.putString("id",id1);
+                followerFragment.setArguments(bundle1);
+                ((MainActivity)context).follow(followerFragment);
                 break;
 
             case R.id.mf_following:
-                ((MainActivity)context).follow(FollowingFragment.newInstance());
+                String id2 = userID;
+                Bundle bundle2 = new Bundle(1);
+                bundle2.putString("id",id2);
+                followingFragment.setArguments(bundle2);
+                ((MainActivity)context).follow(followingFragment);
                 break;
 
         }

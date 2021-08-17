@@ -59,7 +59,7 @@ public class FollowingFragment extends Fragment {
         idlist = new ArrayList<>();
         adapter = new FollowAdapter(nicklist, idlist, context);
         recyclerView.setAdapter(adapter);
-        userID =PreferenceManager.getUserId(view.getContext());
+        userID= getArguments().getString("id");
 
         //Singlevalue로 고쳐봐라. 데이터 터짐.
         db.child("Follow").child("Following").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -111,14 +111,5 @@ public class FollowingFragment extends Fragment {
 
         return view;
     }
-/*
-    public void showProfileFragment(String id) {
-        ProfileFragment profileFragment = new ProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("id",id);
-        profileFragment.setArguments(bundle);
-        ((MainActivity)context).follow(ProfileFragment.newInstance());
-    }
 
- */
 }
