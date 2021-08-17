@@ -217,6 +217,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 else{
                     pf_follow_btn.setBackgroundResource(R.drawable.after_follow_btn);
                     pf_follow_btn.setTextColor(Color.BLACK);
+                    pf_follow_btn.setText("팔로잉");
                 }
             }
 
@@ -247,6 +248,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     db.child("Follow").child("Following").child(userID).child(string_pf_id).setValue(string_pf_id);
                     pf_follow_btn.setBackgroundResource(R.drawable.after_follow_btn);
                     pf_follow_btn.setTextColor(Color.BLACK);
+                    pf_follow_btn.setText("팔로잉");
 
                 }
                 else{
