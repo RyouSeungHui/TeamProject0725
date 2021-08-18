@@ -37,7 +37,6 @@ public class FriendsFragment extends Fragment {
     private FirebaseDatabase database;
     private DatabaseReference db;
 
-    private TextView test;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState){
@@ -55,7 +54,6 @@ public class FriendsFragment extends Fragment {
         postname = new ArrayList<>();
         postuser = new ArrayList<>();
 
-        test = (view).findViewById(R.id.textView);
 
         database=FirebaseDatabase.getInstance();
         db=database.getReference();
@@ -69,8 +67,6 @@ public class FriendsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         String user=NowUser.id;
-
-        test.setText(user);
 
         db.child("Follow").child("Following").child(user).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
