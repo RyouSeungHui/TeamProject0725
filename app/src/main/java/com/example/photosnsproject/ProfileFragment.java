@@ -215,6 +215,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                     pf_follow_btn.setBackgroundResource(R.drawable.follow_btn);
                     pf_follow_btn.setTextColor(Color.WHITE);
+                    pf_follow_btn.setText("팔로우");
 
                 }
                 else{
@@ -259,6 +260,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     db.child("Follow").child("Following").child(userID).child(string_pf_id).removeValue();
                     pf_follow_btn.setBackgroundResource(R.drawable.follow_btn);
                     pf_follow_btn.setTextColor(Color.WHITE);
+                    pf_follow_btn.setText("팔로우");
                 }
             }
 
