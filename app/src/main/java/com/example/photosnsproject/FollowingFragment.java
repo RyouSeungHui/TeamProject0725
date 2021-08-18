@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,7 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class FollowFragment extends Fragment {
+public class FollowingFragment extends Fragment {
 
     private View view;
     private Context context;
@@ -30,10 +32,14 @@ public class FollowFragment extends Fragment {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<String> list;
-    private ArrayList<String> nick;
+    private ArrayList<String> nicklist;
+    private ArrayList<String> idlist;
+
+    private ProfileFragment profileFragment;
+
     private String userID;
-    public static FollowFragment newInstance() {
-        return new FollowFragment();
+    public static FollowingFragment newInstance() {
+        return new FollowingFragment();
     }
 
 
@@ -49,15 +55,14 @@ public class FollowFragment extends Fragment {
         layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         list = new ArrayList<>();
-        nick = new ArrayList<>();
-        adapter = new FollowAdapter(nick, context);
+        nicklist = new ArrayList<>();
+        idlist = new ArrayList<>();
+        adapter = new FollowAdapter(nicklist, idlist, context);
         recyclerView.setAdapter(adapter);
-        userID =PreferenceManager.getUserId(view.getContext());
-
-
+        userID= getArguments().getString("id");
 
         //Singlevalue로 고쳐봐라. 데이터 터짐.
-        db.child("Follow").child("Follower").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+        db.child("Follow").child("Following").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -71,7 +76,8 @@ public class FollowFragment extends Fragment {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                             User user = snapshot.getValue(User.class);
-                            nick.add(user.getNick());
+                            nicklist.add(user.getNick());
+                            idlist.add(user.getId());
                             adapter.notifyDataSetChanged();
 
                         }
@@ -87,14 +93,15 @@ public class FollowFragment extends Fragment {
 
 
             }
-            
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
 
-        nick.clear();
+        nicklist.clear();
+        idlist.clear();
 
 
 
@@ -104,4 +111,5 @@ public class FollowFragment extends Fragment {
 
         return view;
     }
+
 }

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewParent;
 
 public class MainActivity extends AppCompatActivity {
+    private AppCompatActivity appCompatActivity;
 
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        appCompatActivity = this;
         Init();
     }
 

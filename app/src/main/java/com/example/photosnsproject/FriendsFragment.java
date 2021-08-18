@@ -89,8 +89,10 @@ public class FriendsFragment extends Fragment {
                                 postuser.add(followname);
                                 posting.add(item);
                                 postname.add(itemsn.getKey());
+                                sort();
                                 adapter.notifyDataSetChanged();
                             }
+
                         }
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
@@ -99,7 +101,6 @@ public class FriendsFragment extends Fragment {
                     });
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -108,4 +109,32 @@ public class FriendsFragment extends Fragment {
 
 
     }
+
+    public void sort() {
+        PostItem item_tempt;
+        String user_tempt;
+        String name_tempt;
+
+        for(int i=0; i<postuser.size();i++) {
+            for(int j=0;j<postuser.size()-1-i;j++) {
+                if (posting.get(j).getGetTime().compareTo(posting.get(j + 1).getGetTime()) < 0) {
+                    item_tempt = posting.get(j);
+                    user_tempt = postuser.get(j);
+                    name_tempt = postname.get(j);
+
+                    posting.set(j, posting.get(j + 1));
+                    postuser.set(j, postuser.get(j + 1));
+                    postname.set(j, postname.get(j + 1));
+
+                    posting.set(j + 1, item_tempt);
+                    postuser.set(j + 1, user_tempt);
+                    postname.set(j + 1, name_tempt);
+
+                }
+            }
+        }
+
+    }
+
+
 }

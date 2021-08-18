@@ -51,6 +51,8 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
     public void onBindViewHolder(@NonNull PostingAdapter.postviewholder holder, int position) {
         holder.user_name.setText(postuser.get(position));
 
+        holder.timeline.setText(posting.get(position).getGetTime());
+
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         String path = postuser.get(position)+"/"+postname.get(position);
@@ -80,11 +82,13 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
         ImageView user_img;
         TextView user_name;
         ImageView post_img;
+        TextView timeline;
         public postviewholder(@NonNull View itemView) {
             super(itemView);
             this.user_img = itemView.findViewById(R.id.fr_user_img);
             this.user_name = itemView.findViewById(R.id.fr_user_name);
             this.post_img = itemView.findViewById(R.id.fr_post_img);
+            this.timeline = itemView.findViewById(R.id.timeline);
         }
     }
 }
