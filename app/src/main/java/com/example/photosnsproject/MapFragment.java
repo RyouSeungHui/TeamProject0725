@@ -102,13 +102,9 @@ public class MapFragment extends Fragment {
             Animation anim = AnimationUtils.loadAnimation(context, R.anim.rotate_anim);
             btnRenew.startAnimation(anim);
             gpsTracker = new GpsTracker(context);
-/*
+
             latitude = gpsTracker.getLatitude();
             longitude = gpsTracker.getLongitude();
-
-   */
-            latitude = 35.15439;
-            longitude = 129.12101;
 
             eddis.setText("100");
             Findphotobygps(latitude,longitude,100);

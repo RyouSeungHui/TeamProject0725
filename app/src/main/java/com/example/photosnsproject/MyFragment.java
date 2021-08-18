@@ -172,7 +172,7 @@ public class MyFragment extends Fragment implements View.OnClickListener {
         loadreference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Glide.with(getContext()).load(uri).into(profile);
+                Glide.with(context).load(uri).into(profile);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

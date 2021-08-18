@@ -51,6 +51,7 @@
             <EditText
                 android:id="@+id/ed_dis"
                 android:layout_width="50dp"
+                android:inputType="number"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"/>
 
@@ -76,6 +77,8 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginRight="10dp"
+        android:backgroundTint="@color/teal_700"
+        android:tint="@color/white"
         android:src="@drawable/ic_baseline_map_24"
         android:layout_gravity="bottom|right"/>
 
