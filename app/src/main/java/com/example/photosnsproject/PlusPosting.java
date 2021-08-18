@@ -4,15 +4,23 @@ package com.example.photosnsproject;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.media.ExifInterface;
@@ -21,16 +29,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.engine.Resource;
 import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -43,6 +58,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,11 +69,14 @@ public class PlusPosting extends AppCompatActivity {
     private static final int REQUEST_CODE = 0;
     private Spinner spinFriend;
     private Spinner spinPublic;
-    private TextView tvTag, tvFriend, tvLocation, tvPublic;
+    private TextView tvLocation;
+    private CheckBox cbLoc;
     private EditText etTag;
-    private Button btnTag;
-    private ArrayList<String> arrTag, arrFriend, selected, arrPublic, selected2;
-    private String strTag, strFriend, strAddress, strPublic, strContents;
+    private TextView btnTag, btnOkay;
+    private LinearLayout llTag, llFriend;
+    private RadioGroup rgrb;
+    private ArrayList<String> arrTag, arrFriend, selected;
+    private String strAddress, strContents;
     private Float lati=0.0f, longi=0.0f;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -67,6 +86,7 @@ public class PlusPosting extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_1=1;
     private static final int PERMISSIONS_REQUEST_2=2;
     private EditText etContents;
+    private int intPublic;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,27 +106,38 @@ public class PlusPosting extends AppCompatActivity {
         });
 
         tvLocation = findViewById(R.id.tvLocation);
-
+        cbLoc = findViewById(R.id.cbLoc);
+        if(tvLocation.getText().equals("")||tvLocation.getText().equals("위치 정보 없음")){
+            cbLoc.setEnabled(false);
+        }
+        cbLoc.setOnClickListener(v -> {
+            if(!((CheckBox)v).isChecked()){
+                int grey = ContextCompat.getColor(this, R.color.grey);
+                tvLocation.setTextColor(grey);
+            }else{
+                int black = ContextCompat.getColor(this, R.color.blackPrimary);
+                tvLocation.setTextColor(black);
+            }
+        });
 
         //HASH TAG
-        tvTag = findViewById(R.id.tvTag);
         etTag = findViewById(R.id.etTag);
         btnTag = findViewById(R.id.btnTag);
-        strTag="";
+        llTag = findViewById(R.id.llTag);
         arrTag = new ArrayList<>();
+
         btnTag.setOnClickListener(v -> {
-            if(!etTag.equals("")){
-                arrTag.add(etTag.getText().toString());
-                strTag += " #"+etTag.getText().toString();
+            String strTag = etTag.getText().toString();
+            if(!strTag.equals("") && !arrTag.contains(strTag)){
+                arrTag.add(strTag);
                 etTag.setText("");
-                tvTag.setText(strTag);
+                hashTag(strTag, llTag, arrTag, 0);
             }
         });
 
         //Friend TAG (친구 추가 기능 완료시 수정해야 함)
         spinFriend = findViewById(R.id.spinFriend);
-        tvFriend = findViewById(R.id.tvFriend);
-        strFriend="";
+        llFriend = findViewById(R.id.llFriend);
         arrFriend = new ArrayList<>();
         selected = new ArrayList<>();
 
@@ -116,19 +147,6 @@ public class PlusPosting extends AppCompatActivity {
         arrFriend.add("이지훈");
         arrFriend.add("유승희");
 
-
-        //Public TAG
-        spinPublic = findViewById(R.id.spinPublic);
-        tvPublic = findViewById(R.id.tvPublic);
-        strPublic="";
-        arrPublic = new ArrayList<>();
-        selected2 = new ArrayList<>();
-
-        arrPublic.add("공개 범위");
-        arrPublic.add("전체 공개");
-        arrPublic.add("친구만 공개");
-        arrPublic.add("비공개");
-
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, arrFriend);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -137,9 +155,11 @@ public class PlusPosting extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position!=0){
-                    selected.add(arrFriend.get(position));
-                    strFriend+=" @"+arrFriend.get(position);
-                    tvFriend.setText(strFriend);
+                    String strFriend = arrFriend.get(position);
+                    if(!strFriend.equals("")&& !selected.contains(strFriend)){
+                        selected.add(arrFriend.get(position));
+                        hashTag(strFriend, llFriend, selected, 1);
+                    }
                 }
             }
             @Override
@@ -148,24 +168,26 @@ public class PlusPosting extends AppCompatActivity {
             }
         });
 
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, arrPublic);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinPublic.setAdapter(adapter2);
-        spinPublic.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position!=0){
-                    selected2.add(arrPublic.get(position));
-                    strPublic=arrPublic.get(position);
-                    tvPublic.setText(strPublic);
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
 
+        //Public TAG (0:전체공개, 1:친구공개, 2:나만공개)
+        rgrb = findViewById(R.id.rgrb);
+        rgrb.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId){
+                case R.id.rbtn1:
+                    intPublic=0;
+                    break;
+                case R.id.rbtn2:
+                    intPublic=1;
+                    break;
+                case R.id.rbtn3:
+                    intPublic=2;
+                    break;
             }
         });
+        rgrb.check(R.id.rbtn2);
+
+        //BUTTON
+        btnOkay = findViewById(R.id.tvOkay);
     }
 
     private void onCheckPermission() {
@@ -209,9 +231,12 @@ public class PlusPosting extends AppCompatActivity {
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 try {
+                    strAddress="";
                     bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
                     imgPost.setImageBitmap(bitmap);
                     getGPS(data.getData());
+                    btnOkay.setEnabled(true);
+                    btnOkay.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_200)));
                 } catch (Exception e) {
 
                 }
@@ -222,6 +247,7 @@ public class PlusPosting extends AppCompatActivity {
     }
 
     private void getGPS(Uri imgUri) {
+        lati=longi=0.0f;
         String imagePath = "";
         if(Build.VERSION.SDK_INT>=29) {
             imagePath = getRealPathFromURI(imgUri);
@@ -253,6 +279,19 @@ public class PlusPosting extends AppCompatActivity {
         }
         strAddress = getCurrentAddress(lati, longi);
         tvLocation.setText(strAddress);
+
+        if(!tvLocation.getText().equals("")&&!tvLocation.getText().equals("위치 정보 없음")){
+            cbLoc.setEnabled(true);
+            int black = ContextCompat.getColor(this, R.color.blackPrimary);
+            tvLocation.setTextColor(black);
+            cbLoc.setChecked(true);
+        }
+        else{
+            cbLoc.setEnabled(false);
+            int grey = ContextCompat.getColor(this, R.color.grey);
+            tvLocation.setTextColor(grey);
+            cbLoc.setChecked(false);
+        }
 
         bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환
         imgPost.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
@@ -365,13 +404,12 @@ public class PlusPosting extends AppCompatActivity {
         etContents = (EditText)findViewById(R.id.etContents);
         strContents = etContents.getText().toString();
 
-
         //파이어베이스 데이터베이스 연동
         firebaseDatabase = FirebaseDatabase.getInstance();
 
         //DatabaseReference는 데이터베이스의 특정 위치로 연결
         databaseReference = firebaseDatabase.getReference("Users").child(userID).child("post").push();
-        PostItem postItem = new PostItem(strAddress, lati, longi, arrTag, selected, selected2, strContents, getTime());
+        PostItem postItem = new PostItem(strAddress, lati, longi, arrTag, selected, intPublic, strContents, getTime());
         databaseReference.setValue(postItem);
 
         firebaseStorage = FirebaseStorage.getInstance();
@@ -389,4 +427,48 @@ public class PlusPosting extends AppCompatActivity {
 
         finish();
     }
+
+    public void hashTag(String tag, LinearLayout lv, ArrayList<String> arr, int code){
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        layoutParams.bottomMargin = 10;
+        layoutParams.topMargin = 10;
+        layoutParams.leftMargin = 5;
+        layoutParams.rightMargin = 15;
+        LinearLayout ll = new LinearLayout(this);
+        ll.setBackground(ContextCompat.getDrawable(this, R.drawable.round_background));
+        ll.setPadding(20, 10, 10, 10);
+        ll.setGravity(Gravity.CENTER_VERTICAL);
+        ll.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_200)));
+        ll.setOrientation(LinearLayout.HORIZONTAL);
+        ll.setLayoutParams(layoutParams);
+
+        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+        layoutParams2.rightMargin = 5;
+        TextView tv = new TextView(this);
+        tv.setTextColor(getColor(R.color.teal_700));
+        tv.setTextSize(13);
+        if(code==0) tv.setText("# "+tag);
+        else tv.setText("@ "+tag);
+        tv.setLayoutParams(layoutParams2);
+        tv.setTypeface(null, Typeface.BOLD);
+
+        ll.addView(tv);
+
+        LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(40, 40, 1);
+        ImageView iv = new ImageView(this);
+        iv.setImageResource(R.drawable.ic_baseline_cancel_24);
+        iv.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_700)));
+        iv.setLayoutParams(layoutParams3);
+        iv.setOnClickListener(v -> {
+            arr.remove(tag);
+            ViewGroup parent = (ViewGroup) iv.getParent();
+            ViewGroup grandParent = (ViewGroup) parent.getParent();
+            grandParent.removeView(parent);
+        });
+
+        ll.addView(iv);
+
+        lv.addView(ll);
+    }
+
 }

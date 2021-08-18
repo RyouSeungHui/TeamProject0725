@@ -1,17 +1,21 @@
 package com.example.photosnsproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
     private AppCompatActivity appCompatActivity;
@@ -25,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private RandomFragment randomFragment;
     private ViewPager viewPager;
 
-    private View[] viewGroup;
+    private ImageView[] imgGroup;
+    private Drawable[] drawables_g, drawables_b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +53,25 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flFragment, friendsFragment).commitAllowingStateLoss();
 
-        viewGroup = new View[4];
-        viewGroup[0] = findViewById(R.id.view1);
-        viewGroup[1] = findViewById(R.id.view2);
-        viewGroup[2] = findViewById(R.id.view3);
-        viewGroup[3] = findViewById(R.id.view4);
+        imgGroup = new ImageView[4];
+        imgGroup[0] = findViewById(R.id.img1);
+        imgGroup[1] = findViewById(R.id.img2);
+        imgGroup[2] = findViewById(R.id.img3);
+        imgGroup[3] = findViewById(R.id.img4);
+
+        drawables_g = new Drawable[4];
+        drawables_g[0] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_map_24);
+        drawables_g[1] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_star_border_24);
+        drawables_g[2] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_people_outline_24);
+        drawables_g[3] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_person_outline_24);
+
+        drawables_b = new Drawable[4];
+        drawables_b[0] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_map_24);
+        drawables_b[1] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_star_24);
+        drawables_b[2] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_people_24);
+        drawables_b[3] = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.ic_baseline_person_pin_24);
+
+        clickHandler(findViewById(R.id.ll3));
     }
 
     public void clickHandler(View view) {
@@ -77,10 +96,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     private void SetView(int targetI) {
         for(int i = 0; i<4; i++){
-            if(i==targetI) viewGroup[i].setBackgroundColor(Color.BLACK);
-            else viewGroup[i].setBackgroundColor(Color.WHITE);
+            if(i==targetI) {
+                imgGroup[i].setImageDrawable(drawables_b[i]);
+                imgGroup[i].setColorFilter(Color.parseColor("#4F4F4F"));
+            }
+            else {
+                imgGroup[i].setImageDrawable(drawables_g[i]);
+                imgGroup[i].setColorFilter(Color.parseColor("#BDBDBD"));
+            }
         }
     }
 
