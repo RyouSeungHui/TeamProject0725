@@ -19,9 +19,10 @@ import java.util.ArrayList;
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> {
 
     private ArrayList<User> list;
-    private Context context; //무슨화면
+    private Context context; // 검색어 화면
 
-    public SearchAdapter( ArrayList<User> list, Context context){ //생성자
+
+    public SearchAdapter( ArrayList<User> list,  Context context){ //생성자
 
         this.list=list;
         this.context=context; //무슨 화면
@@ -36,11 +37,12 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         return holder;
     } //xml이랑 어뎁터랑 연결. 연결한것을 holder에 담음.  우리가 쓸수 있도록 onbind로 넘김.
 
+
+
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
 
         holder.search_text.setText(list.get(position).getNick());
-
         holder.sp_linear1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,4 +75,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
 
         }
     }
+
+
 }

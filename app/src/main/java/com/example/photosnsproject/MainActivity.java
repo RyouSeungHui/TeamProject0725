@@ -113,10 +113,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void search(View view) {
 
-        Intent intent= new Intent(this,Search.class);
+        Intent intent = new Intent(this,Search.class);
         startActivityForResult(intent,1);
     }
 
+    public void searchtag(View view) {
+        Intent intent = new Intent(this, SearchTag.class);
+        startActivityForResult(intent, 2);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -131,9 +135,12 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.flFragment, profileFragment).commitAllowingStateLoss();
             }
+        }
+        else if(requestCode==2){
 
         }
     }
+
 
     public void follow(Fragment fragment){
         fragmentTransaction = fragmentManager.beginTransaction();

@@ -5,15 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Search">
-
+    tools:context=".SearchTag">
 
     <EditText
-        android:id="@+id/search_edit"
+        android:id="@+id/search_tag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="검색어를 입력하세요."/>
-
+        android:hint="태그를 이용한 검색" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_rcy"
