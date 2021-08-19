@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 public class FollowingFragment extends Fragment {
 
+    private  int index;
     private View view;
     private Context context;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -38,18 +39,29 @@ public class FollowingFragment extends Fragment {
     private ProfileFragment profileFragment;
 
     private String userID;
+    /*
     public static FollowingFragment newInstance() {
         return new FollowingFragment();
+    }*/
+
+
+    public FollowingFragment(String id, int index) {
+
+        this.userID=id;
+        this.index=index;
     }
 
 
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        context = getActivity();
         view = inflater.inflate(R.layout.activity_follow_fragment, container, false);
+        Init();
+        return view;
+    }
+
+    private void Init(){
+        context = getActivity();
         recyclerView = (view).findViewById(R.id.ff_rcy);
         recyclerView.setHasFixedSize(true); //정리한번
         layoutManager = new LinearLayoutManager(context);
@@ -57,9 +69,9 @@ public class FollowingFragment extends Fragment {
         list = new ArrayList<>();
         nicklist = new ArrayList<>();
         idlist = new ArrayList<>();
-        adapter = new FollowAdapter(nicklist, idlist, context);
+        adapter = new FollowAdapter(nicklist, idlist, context,index);
         recyclerView.setAdapter(adapter);
-        userID= getArguments().getString("id");
+
 
         //Singlevalue로 고쳐봐라. 데이터 터짐.
         db.child("Follow").child("Following").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -109,7 +121,6 @@ public class FollowingFragment extends Fragment {
 
 
 
-        return view;
     }
 
 }
