@@ -1,5 +1,7 @@
 package com.example.photosnsproject;
 
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,8 +22,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class FollowerFragment extends Fragment {
+public class FollowerFragment extends Fragment{
 
+    private int index;
     private View view;
     private Context context;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -32,20 +35,31 @@ public class FollowerFragment extends Fragment {
     private ArrayList<String> list;
     private ArrayList<String> nicklist;
     private ArrayList<String> idlist;
-
     private String userID;
+    /*
     public static FollowerFragment newInstance() {
         return new FollowerFragment();
+    }*/
+
+
+
+    public FollowerFragment(String id, int index) {
+        this.userID=id;
+        this.index=index;
+
     }
 
 
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        context = getActivity();
         view = inflater.inflate(R.layout.activity_follow_fragment, container, false);
+        Init();
+        return view;
+    }
+
+    private void Init(){
+        context = getActivity();
         recyclerView = (view).findViewById(R.id.ff_rcy);
         recyclerView.setHasFixedSize(true); //정리한번
         layoutManager = new LinearLayoutManager(context);
@@ -53,12 +67,8 @@ public class FollowerFragment extends Fragment {
         list = new ArrayList<>();
         nicklist = new ArrayList<>();
         idlist = new ArrayList<>();
-        adapter = new FollowAdapter(nicklist, idlist, context);
+        adapter = new FollowAdapter(nicklist, idlist, context,index);
         recyclerView.setAdapter(adapter);
-        userID= getArguments().getString("id");
-
-
-
 
 
         //Singlevalue로 고쳐봐라. 데이터 터짐.
@@ -93,7 +103,7 @@ public class FollowerFragment extends Fragment {
 
 
             }
-            
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -105,10 +115,7 @@ public class FollowerFragment extends Fragment {
 
 
 
-
-
-
-
-        return view;
     }
+
+
 }

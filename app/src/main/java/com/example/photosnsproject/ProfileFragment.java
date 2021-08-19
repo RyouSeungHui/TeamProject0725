@@ -61,8 +61,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private String userID;
-    private FollowerFragment followerFragment=new FollowerFragment();
-    private FollowingFragment followingFragment=new FollowingFragment();
+    private int flag;
+    private FollowerFragment followerFragment;
+    private FollowingFragment followingFragment;
 
 
 
@@ -74,11 +75,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         context = getActivity();
         view = inflater.inflate(R.layout.activity_profile_fragment, container, false);
-
-
         profile=view.findViewById(R.id.profile);
         pf_id = (TextView) view.findViewById(R.id.pf_id); //2
         string_pf_id = getArguments().getString("id");
+        flag=getArguments().getInt("flag");
         pf_follow_btn=(Button) view.findViewById(R.id.pf_follow_btn);
         pf_gallery=(view).findViewById(R.id.pf_gallery);
         pf_follower=(view).findViewById(R.id.pf_follower);
@@ -284,19 +284,28 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.pf_follower:
-                String id1 = string_pf_id;
-                Bundle bundle1 = new Bundle(1);
-                bundle1.putString("id",id1);
-                followerFragment.setArguments(bundle1);
-                ((MainActivity)context).follow(followerFragment);
+
+                if(flag==0) {
+                    FollowFragment followFragment=new FollowFragment(string_pf_id,0,0);
+                    ((MainActivity) context).follow(followFragment);
+                }
+                else{
+                    FollowFragment followFragment=new FollowFragment(string_pf_id,0,1);
+                    ((Follow_main)context).follow(followFragment);
+                }
                 break;
 
             case R.id.pf_following:
-                String id2 = string_pf_id;
-                Bundle bundle2 = new Bundle(1);
-                bundle2.putString("id",id2);
-                followingFragment.setArguments(bundle2);
-                ((MainActivity)context).follow(followingFragment);
+
+
+                if(flag==0) {
+                    FollowFragment followFragment2=new FollowFragment(string_pf_id,1,0);
+                    ((MainActivity) context).follow(followFragment2);
+                }
+                else{
+                    FollowFragment followFragment2=new FollowFragment(string_pf_id,1,1);
+                    ((Follow_main)context).follow(followFragment2);
+                }
                 break;
 
         }

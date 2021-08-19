@@ -33,17 +33,19 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
     private ArrayList<String> nicklist;
     private ArrayList<String> idlist;
     private Context context;
+    private int index;
     private FirebaseStorage storage=FirebaseStorage.getInstance();
     private StorageReference storageReference=storage.getReference();
 
     private ProfileFragment profileFragment=new ProfileFragment();
 
 
-    public FollowAdapter( ArrayList<String> nicklist, ArrayList<String> idlist, Context context){
+    public FollowAdapter( ArrayList<String> nicklist, ArrayList<String> idlist, Context context,int index){
 
         this.nicklist=nicklist;
         this.idlist=idlist;
         this.context=context;
+        this.index=index;
     }
 
     @NonNull
@@ -77,10 +79,22 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
             @Override
             public void onClick(View view) {
                 String id = idlist.get(position);
-                Bundle bundle = new Bundle(1);
+                Bundle bundle = new Bundle(2);
                 bundle.putString("id",id);
-                profileFragment.setArguments(bundle);
-                ((MainActivity)context).follow(profileFragment);
+
+                if(index==1) {
+                    bundle.putInt("flag",1);
+                    profileFragment.setArguments(bundle);
+                    ((Follow_main)context).follow(profileFragment);
+                }
+                else{
+                    bundle.putInt("flag",0);
+                    profileFragment.setArguments(bundle);
+                    ((MainActivity) context).follow(profileFragment);
+                }
+
+
+
             }
         });
 

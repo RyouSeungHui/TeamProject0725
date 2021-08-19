@@ -66,8 +66,8 @@ public class MyFragment extends Fragment implements View.OnClickListener {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private String userID;
-    private FollowerFragment followerFragment=new FollowerFragment();
-    private FollowingFragment followingFragment=new FollowingFragment();
+    private FollowerFragment followerFragment;
+    private FollowingFragment followingFragment;
 
 
 
@@ -334,18 +334,28 @@ public class MyFragment extends Fragment implements View.OnClickListener {
 
             case R.id.mf_follower:
                 String id1 = userID;
-                Bundle bundle1 = new Bundle(1);
-                bundle1.putString("id",id1);
+                Intent intent1 = new Intent(getActivity(),Follow_main.class);
+                intent1.putExtra("id",id1);
+                intent1.putExtra("page",0);
+                startActivity(intent1);
+                /*
+
                 followerFragment.setArguments(bundle1);
                 ((MainActivity)context).follow(followerFragment);
+                */
                 break;
 
             case R.id.mf_following:
                 String id2 = userID;
-                Bundle bundle2 = new Bundle(1);
-                bundle2.putString("id",id2);
+                Intent intent2 = new Intent(getActivity(),Follow_main.class);
+                intent2.putExtra("id",id2);
+                intent2.putExtra("page",1);
+                startActivity(intent2);
+                /*
                 followingFragment.setArguments(bundle2);
                 ((MainActivity)context).follow(followingFragment);
+                */
+
                 break;
 
         }
