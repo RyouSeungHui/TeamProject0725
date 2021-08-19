@@ -117,9 +117,10 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent,1);
     }
 
-    public void searchtag(View view) {
-        Intent intent = new Intent(this, SearchTag.class);
-        startActivityForResult(intent, 2);
+    public void searchtag2(View view) {
+
+        Intent intent = new Intent(this,SearchTag.class);
+        startActivityForResult(intent,2);
     }
 
     @Override
@@ -136,9 +137,8 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction.replace(R.id.flFragment, profileFragment).commitAllowingStateLoss();
             }
         }
-        else if(requestCode==2){
 
-        }
+
     }
 
 

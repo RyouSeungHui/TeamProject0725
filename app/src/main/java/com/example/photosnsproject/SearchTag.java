@@ -41,9 +41,7 @@ public class SearchTag extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         list_tag=new ArrayList<>();
         wholelist_tag=new ArrayList<>();
-
         adapter_tag=new SearchTagAdapter(list_tag, this);
-
         recyclerView.setAdapter(adapter_tag);
         database=FirebaseDatabase.getInstance();
         db=database.getReference();

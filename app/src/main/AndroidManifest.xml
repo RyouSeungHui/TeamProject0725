@@ -28,6 +28,7 @@
 
         <activity android:name=".Login" />
         <activity android:name=".Search" />
+        <activity android:name=".SearchTag" />
         <activity
             android:name=".PlusPosting"
             android:windowSoftInputMode="adjustNothing" />
