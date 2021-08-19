@@ -17,5 +17,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginRight="10dp"
         android:src="@drawable/img_back"
+        android:backgroundTint="@color/teal_700"
+        app:tint="@color/white"
         android:layout_gravity="bottom|right"/>
 </FrameLayout>

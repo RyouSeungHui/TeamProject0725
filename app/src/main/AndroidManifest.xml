@@ -39,7 +39,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Signin" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="adjustNothing"/>
     </application>
 
 </manifest>
