@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -168,6 +169,8 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 tv_tag.setText("@ " + posting.get(position).getFriend().get(i));
                 tv_tag.setLayoutParams(layoutParams);
                 tv_tag.setTypeface(null, Typeface.BOLD);
+                tv_tag.setClickable(true);
+
 
                 holder.ll_friend.addView(tv_tag);
             }

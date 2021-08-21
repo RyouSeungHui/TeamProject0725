@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent,1);
     }
 
-    public void searchtag2(View view) {
+    public void searchtag(View view) {
 
         Intent intent = new Intent(this,SearchTag.class);
         startActivityForResult(intent,2);
