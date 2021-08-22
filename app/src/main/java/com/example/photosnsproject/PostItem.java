@@ -70,9 +70,7 @@ public class PostItem {
         this.longi = longi;
     }
 
-    public ArrayList<String> getTag() {
-        return tag;
-    }
+    public ArrayList<String> getTag() { return tag; }
 
     public void setTag(ArrayList<String> tag) {
         this.tag = tag;

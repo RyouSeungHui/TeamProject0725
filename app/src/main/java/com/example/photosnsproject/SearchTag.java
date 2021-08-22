@@ -17,6 +17,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class SearchTag extends AppCompatActivity {
 
@@ -24,7 +26,9 @@ public class SearchTag extends AppCompatActivity {
     private RecyclerView.Adapter adapter_tag;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<String> list_tag;
+    private ArrayList<PostItem> list_postitem;
     private ArrayList<PostItem> wholelist_tag;
+    private ArrayList<PostItem> wholelist_deleted;
     private FirebaseDatabase database;
     private DatabaseReference db;
     EditText search_tag;
@@ -40,7 +44,9 @@ public class SearchTag extends AppCompatActivity {
         layoutManager= new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         list_tag=new ArrayList<>();
+        list_postitem=new ArrayList<>();
         wholelist_tag=new ArrayList<>();
+        wholelist_deleted=new ArrayList<>();
         adapter_tag=new SearchTagAdapter(list_tag, this);
         recyclerView.setAdapter(adapter_tag);
         database=FirebaseDatabase.getInstance();
@@ -53,6 +59,8 @@ public class SearchTag extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 wholelist_tag.clear();
+                wholelist_deleted.clear();
+
                 for (DataSnapshot sn : snapshot.getChildren()){
                     User user=sn.getValue(User.class);
                     String strId = user.getId();
@@ -69,6 +77,7 @@ public class SearchTag extends AppCompatActivity {
                                     {
                                         wholelist_tag.add(postitem);
                                     }
+
                                 }
 
                                 catch(NullPointerException e) {
@@ -118,12 +127,21 @@ public class SearchTag extends AppCompatActivity {
     }
 
     public void search_text2(String s){
-        list_tag.clear();
-        for(int i=0; i<wholelist_tag.size(); i++){
 
-            for(int j=0; j<wholelist_tag.get(i).getTag().size(); j++)
+        for(int i=0; i<wholelist_tag.size(); i++) {
+            if(!wholelist_deleted.contains(wholelist_tag.get(i))){
+                wholelist_deleted.add(wholelist_tag.get(i));
+            }
+        }
+
+        list_tag.clear();
+
+
+        for(int i=0; i<wholelist_deleted.size(); i++){
+
+            for(int j=0; j<wholelist_deleted.get(i).getTag().size(); j++)
             {
-                String strTag=wholelist_tag.get(i).getTag().get(j);
+                String strTag=wholelist_deleted.get(i).getTag().get(j);
                 if(strTag.contains(s)) {
                     list_tag.add(strTag);
                 }

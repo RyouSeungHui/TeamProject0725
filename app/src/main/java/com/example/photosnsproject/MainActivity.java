@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewParent;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     private AppCompatActivity appCompatActivity;
 
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private MapFragment mapFragment;
     private MyFragment myFragment;
     private ProfileFragment profileFragment;
+    private TagPostingFragment tagPostingFragment;
     private RandomFragment randomFragment;
     private ViewPager viewPager;
 
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         myFragment = new MyFragment();
         randomFragment = new RandomFragment();
         profileFragment= new ProfileFragment();
+        tagPostingFragment = new TagPostingFragment();
 
 
         fragmentTransaction = fragmentManager.beginTransaction();
@@ -117,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent,1);
     }
 
-    public void searchtag2(View view) {
+    public void searchtag(View view) {
 
         Intent intent = new Intent(this,SearchTag.class);
         startActivityForResult(intent,2);
@@ -135,6 +139,19 @@ public class MainActivity extends AppCompatActivity {
                 profileFragment.setArguments(bundle);
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.flFragment, profileFragment).commitAllowingStateLoss();
+            }
+        }
+
+        else if(requestCode==2) {
+            if(resultCode==RESULT_OK){
+                ArrayList<String> user_id=data.getStringArrayListExtra("user_id");
+                ArrayList<String> post_id=data.getStringArrayListExtra("post_id");
+                Bundle bundle = new Bundle(2);
+                bundle.putStringArrayList("user_id", user_id);
+                bundle.putStringArrayList("post_id", post_id);
+                tagPostingFragment.setArguments(bundle);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flFragment, tagPostingFragment).commitAllowingStateLoss();
             }
         }
 

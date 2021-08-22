@@ -18,9 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-
 
 public class SearchTagAdapter extends RecyclerView.Adapter<SearchTagAdapter.SearchTagViewHolder> {
 
@@ -28,7 +26,8 @@ public class SearchTagAdapter extends RecyclerView.Adapter<SearchTagAdapter.Sear
     private Context context_postitem;
     private FirebaseDatabase database;
     private DatabaseReference db;
-    private ArrayList<PostItem> list_postitem;
+    private ArrayList<String> arrId_adapter;
+    private ArrayList<String> postId_adapter;
 
 
     public SearchTagAdapter(ArrayList<String> list_string, Context context_postitem){ //생성자
@@ -47,12 +46,14 @@ public class SearchTagAdapter extends RecyclerView.Adapter<SearchTagAdapter.Sear
     }
 
 
+
     @Override
     public void onBindViewHolder(@NonNull SearchTagViewHolder holder, int position) {
 
         database = FirebaseDatabase.getInstance();
         db = database.getReference();
-
+        arrId_adapter=new ArrayList<>();
+        postId_adapter=new ArrayList<>();
         holder.search_text.setText(list_string.get(position));
         holder.sp_linear1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,10 +64,13 @@ public class SearchTagAdapter extends RecyclerView.Adapter<SearchTagAdapter.Sear
                 db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        list_postitem.clear();
+
                         for (DataSnapshot sn : snapshot.getChildren()) {
                             User user_Adapter = sn.getValue(User.class);
                             String strId_Adapter = user_Adapter.getId();
+
+
+
                             db.child("Users").child(strId_Adapter).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -75,16 +79,22 @@ public class SearchTagAdapter extends RecyclerView.Adapter<SearchTagAdapter.Sear
 
                                         try {
                                             ArrayList<String> arrTag_Adapter = postitem_Adapter.getTag();
+                                            for(int i=0; i<arrTag_Adapter.size(); i++)
+                                            {
+                                                if(arrTag_Adapter.get(i).equals(key))
+                                                {
+                                                    arrId_adapter.add(strId_Adapter);
+                                                    postId_adapter.add(sn2.getKey());
 
-                                            if (arrTag_Adapter.equals(key)) {
-                                                list_postitem.add(postitem_Adapter);
+                                                }
                                             }
+
+
                                         } catch (NullPointerException e) {
 
                                         }
                                     }
                                 }
-
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError error) {
                                 }
@@ -97,14 +107,23 @@ public class SearchTagAdapter extends RecyclerView.Adapter<SearchTagAdapter.Sear
 
                     }
                 });
+
+                Intent intent=new Intent();
+                intent.putStringArrayListExtra("user_id", arrId_adapter);
+                intent.putStringArrayListExtra("post_id", postId_adapter);
+                ((Activity)context_postitem).setResult(Activity.RESULT_OK,intent); //결과설정
+                ((Activity)context_postitem).finish();
+
+
             }
         });
-    }
-    @Override
 
+    }
+
+    @Override
     public int getItemCount() {
 
-        return (list_postitem !=null ? list_postitem.size() : 0);
+        return (list_string !=null ? list_string.size() : 0);
     }
 
     //기능 설정

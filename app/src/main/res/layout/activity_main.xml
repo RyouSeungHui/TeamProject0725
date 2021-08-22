@@ -20,7 +20,6 @@
             android:onClick="search"
             android:textSize="25sp"
             android:textColor="@color/black"
-            android:gravity="center"
             android:text="닉네임 검색"/>
 
         <TextView
@@ -28,14 +27,10 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:layout_weight="1"
-            android:gravity="center"
             android:onClick="searchtag"
             android:textColor="@color/black"
             android:textSize="25sp"
             android:text="태그를 이용한 검색"/>
-
-
-
 
     </LinearLayout>
 
