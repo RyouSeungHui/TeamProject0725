@@ -268,7 +268,7 @@
                     <Spinner
                         android:id="@+id/spinFriend"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp" />
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
                 <LinearLayout
