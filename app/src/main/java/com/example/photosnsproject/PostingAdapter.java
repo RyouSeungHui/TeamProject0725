@@ -1,6 +1,7 @@
 package com.example.photosnsproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -49,6 +50,11 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
 
     private FirebaseDatabase database=FirebaseDatabase.getInstance();
     private DatabaseReference db=database.getReference();
+
+    ArrayList<PostItem> item=new ArrayList<>();
+    ArrayList<String> user_id=new ArrayList<>();
+    ArrayList<String> post_id=new ArrayList<>();
+
 
     public PostingAdapter(ArrayList<PostItem> posting, Context context,ArrayList<String> postname,ArrayList<String> postuser) {
         this.posting = posting;
@@ -151,6 +157,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
 
         try {
             for (int i = 0; i < posting.get(position).getTag().size(); i++) {
+
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 layoutParams.leftMargin = 30;
 
@@ -164,25 +171,12 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 tv_tag.setClickable(true);
 
                 String tag = posting.get(position).getTag().get(i);
-                /*
                 tv_tag.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        ArrayList<PostItem> item;
-                        ArrayList<String> user_id;
-                        ArrayList<String> post_id;
-
-                        item = new ArrayList<>();
-                        user_id = new ArrayList<>();
-                        post_id = new ArrayList<>();
-
                         db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                item.clear();
-                                user_id.clear();
-                                post_id.clear();
                                 for (DataSnapshot sn : snapshot.getChildren()) {
                                     User user_Adapter = sn.getValue(User.class);
                                     String strId_Adapter = user_Adapter.getId();
@@ -195,42 +189,30 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                                                 try {
                                                     ArrayList<String> arrTag_Adapter = postitem_Adapter.getTag();
 
-                                                    if (arrTag_Adapter.equals(tag)) {
-                                                        item.add(postitem_Adapter);
-                                                        user_id.add(strId_Adapter);
-                                                        post_id.add(sn2.getKey());
+                                                    for(int k=0;k<arrTag_Adapter.size();k++) {
+                                                        if (arrTag_Adapter.get(k).equals(tag)) {
+                                                            adding(postitem_Adapter,strId_Adapter,sn2.getKey());
+                                                        }
+                                                        break;
                                                     }
                                                 } catch (NullPointerException e) {
-
                                                 }
                                             }
                                         }
-
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError error) {
                                         }
                                     });
                                 }
+                                transport();
                             }
-
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
 
                             }
                         });
-
-                        TagPostingFragment tagPostingFragment = new TagPostingFragment();
-                        Bundle bundle = new Bundle();
-                       // bundle.putParcelableArrayList("postitem",(ArrayList<? extends Parcelable>) item);
-                        bundle.putStringArrayList("user_id",user_id);
-                        bundle.putStringArrayList("post_id",post_id);
-                        tagPostingFragment.setArguments(bundle);
-                        ((MainActivity)context).follow(tagPostingFragment);
-
                     }
                 });
-                */
                 holder.ll_tag.addView(tv_tag);
             }
         } catch(NullPointerException e) {
@@ -309,6 +291,8 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
         TextView mention;
         LinearLayout ll_friend;
 
+        TextView test;
+
         public postviewholder(@NonNull View itemView) {
             super(itemView);
             this.user_img = itemView.findViewById(R.id.fr_user_img);
@@ -318,6 +302,25 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
             this.ll_tag=itemView.findViewById(R.id.ll_tag);
             this.mention=itemView.findViewById(R.id.mention);
             this.ll_friend=itemView.findViewById(R.id.ll_friend);
+            this.test=itemView.findViewById(R.id.test1);
         }
+    }
+
+    public void transport() {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {}
+        TagPostingFragment tagPostingFragment = new TagPostingFragment();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("user_id",user_id);
+        bundle.putStringArrayList("post_id",post_id);
+        tagPostingFragment.setArguments(bundle);
+        ((MainActivity)context).follow(tagPostingFragment);
+    }
+
+    public void adding(PostItem postitem_Adapter,String strId_Adapter,String postkey) {
+        item.add(postitem_Adapter);
+        user_id.add(strId_Adapter);
+        post_id.add(postkey);
     }
 }
