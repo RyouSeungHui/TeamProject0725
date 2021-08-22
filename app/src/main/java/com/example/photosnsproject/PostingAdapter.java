@@ -222,7 +222,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
 
                         TagPostingFragment tagPostingFragment = new TagPostingFragment();
                         Bundle bundle = new Bundle();
-                        bundle.putParcelableArrayList("postitem",(ArrayList<? extends Parcelable>) item);
+                       // bundle.putParcelableArrayList("postitem",(ArrayList<? extends Parcelable>) item);
                         bundle.putStringArrayList("user_id",user_id);
                         bundle.putStringArrayList("post_id",post_id);
                         tagPostingFragment.setArguments(bundle);

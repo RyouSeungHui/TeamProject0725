@@ -41,12 +41,11 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
     private ProfileFragment profileFragment=new ProfileFragment();
 
 
-    public FollowAdapter( ArrayList<String> nicklist, ArrayList<String> idlist, Context context,int index){
+    public FollowAdapter( ArrayList<String> nicklist, ArrayList<String> idlist, Context context){
 
         this.nicklist=nicklist;
         this.idlist=idlist;
         this.context=context;
-        this.index=index;
     }
 
     @NonNull
@@ -62,6 +61,7 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
     public void onBindViewHolder(@NonNull FollowViewHolder holder, int position) {
         holder.followlist_nick.setText(nicklist.get(position));
         holder.followlist_id.setText(idlist.get(position));
+
 
         StorageReference loadreference=storageReference.child("profile").child(idlist.get(position)+".png");
 

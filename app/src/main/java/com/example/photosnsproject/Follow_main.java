@@ -42,7 +42,7 @@ public class Follow_main extends Fragment{
 
         fragmentManager =getActivity().getSupportFragmentManager();
         profileFragment= new ProfileFragment();
-        followFragment=new FollowFragment(id,page); //index : 1 => Follow_main
+        followFragment=new FollowFragment(id,page);
         //시작화면.
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.follow_fragment,followFragment ).commitAllowingStateLoss();

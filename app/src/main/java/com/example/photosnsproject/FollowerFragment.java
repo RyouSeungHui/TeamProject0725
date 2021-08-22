@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class FollowerFragment extends Fragment{
 
-    private int index;
+
     private View view;
     private Context context;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -67,7 +67,7 @@ public class FollowerFragment extends Fragment{
         list = new ArrayList<>();
         nicklist = new ArrayList<>();
         idlist = new ArrayList<>();
-        adapter = new FollowAdapter(nicklist, idlist, context,index);
+        adapter = new FollowAdapter(nicklist, idlist, context);
         recyclerView.setAdapter(adapter);
 
 

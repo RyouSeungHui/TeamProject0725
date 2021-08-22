@@ -66,8 +66,6 @@ public class MyFragment extends Fragment implements View.OnClickListener {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private String userID;
-    private FollowerFragment followerFragment;
-    private FollowingFragment followingFragment;
     private Follow_main follow_main;
 
 
