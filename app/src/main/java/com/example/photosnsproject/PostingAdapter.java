@@ -164,7 +164,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 tv_tag.setClickable(true);
 
                 String tag = posting.get(position).getTag().get(i);
-
+                /*
                 tv_tag.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -230,7 +230,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
 
                     }
                 });
-
+                */
                 holder.ll_tag.addView(tv_tag);
             }
         } catch(NullPointerException e) {
