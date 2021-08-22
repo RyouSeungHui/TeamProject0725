@@ -233,17 +233,17 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 tv_tag.setClickable(true);
 
                 // 아래 사항 조치후 삭제할 line
-                tv_tag.setText("@ " + posting.get(position).getFriend().get(i));
 
 
-                /*   <- PostItem - Friends ArrayList 이름을 id로 수정한 후 적용
+
+
                 String user_id = posting.get(position).getFriend().get(i);
 
                 db.child("Users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         User user = snapshot.getValue(User.class);
-                        String user_name=user.getId();
+                        String user_name=user.getNick();
 
                         tv_tag.setText("@ " + user_name);
                     }
@@ -266,7 +266,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                     }
                 });
 
-                */
+
 
                 holder.ll_friend.addView(tv_tag);
             }
