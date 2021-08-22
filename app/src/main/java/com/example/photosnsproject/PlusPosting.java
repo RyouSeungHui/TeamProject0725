@@ -1,474 +1,1 @@
-
-package com.example.photosnsproject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Typeface;
-import android.location.Address;
-import android.location.Geocoder;
-import android.media.ExifInterface;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.bumptech.glide.load.engine.Resource;
-import com.google.android.gms.auth.api.signin.internal.Storage;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-public class PlusPosting extends AppCompatActivity {
-    private ImageView imgPost;
-    private static final int REQUEST_CODE = 0;
-    private Spinner spinFriend;
-    private Spinner spinPublic;
-    private TextView tvLocation;
-    private CheckBox cbLoc;
-    private EditText etTag;
-    private TextView btnTag, btnOkay;
-    private LinearLayout llTag, llFriend;
-    private RadioGroup rgrb;
-    private ArrayList<String> arrTag, arrFriend, selected;
-    private String strAddress, strContents;
-    private Float lati=0.0f, longi=0.0f;
-    private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference databaseReference;
-    private FirebaseStorage firebaseStorage;
-    private StorageReference storageReference;
-    private Bitmap bitmap;
-    private static final int PERMISSIONS_REQUEST_1=1;
-    private static final int PERMISSIONS_REQUEST_2=2;
-    private EditText etContents;
-    private int intPublic;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_plus_posting);
-        init();
-    }
-
-    private void init() {
-        //GET IMAGE
-        imgPost = findViewById(R.id.imgPost);
-        imgPost.setOnClickListener(v -> {
-            onCheckPermission();
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_CODE);
-        });
-
-        tvLocation = findViewById(R.id.tvLocation);
-        cbLoc = findViewById(R.id.cbLoc);
-        if(tvLocation.getText().equals("")||tvLocation.getText().equals("위치 정보 없음")){
-            cbLoc.setEnabled(false);
-        }
-        cbLoc.setOnClickListener(v -> {
-            if(!((CheckBox)v).isChecked()){
-                int grey = ContextCompat.getColor(this, R.color.grey);
-                tvLocation.setTextColor(grey);
-            }else{
-                int black = ContextCompat.getColor(this, R.color.blackPrimary);
-                tvLocation.setTextColor(black);
-            }
-        });
-
-        //HASH TAG
-        etTag = findViewById(R.id.etTag);
-        btnTag = findViewById(R.id.btnTag);
-        llTag = findViewById(R.id.llTag);
-        arrTag = new ArrayList<>();
-
-        btnTag.setOnClickListener(v -> {
-            String strTag = etTag.getText().toString();
-            if(!strTag.equals("") && !arrTag.contains(strTag)){
-                arrTag.add(strTag);
-                etTag.setText("");
-                hashTag(strTag, llTag, arrTag, 0);
-            }
-        });
-
-        //Friend TAG (친구 추가 기능 완료시 수정해야 함)
-        spinFriend = findViewById(R.id.spinFriend);
-        llFriend = findViewById(R.id.llFriend);
-        arrFriend = new ArrayList<>();
-        selected = new ArrayList<>();
-
-        arrFriend.add("내 친구 리스트");
-        arrFriend.add("우승수");
-        arrFriend.add("장호성");
-        arrFriend.add("이지훈");
-        arrFriend.add("유승희");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, arrFriend);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinFriend.setAdapter(adapter);
-        spinFriend.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position!=0){
-                    String strFriend = arrFriend.get(position);
-                    if(!strFriend.equals("")&& !selected.contains(strFriend)){
-                        selected.add(arrFriend.get(position));
-                        hashTag(strFriend, llFriend, selected, 1);
-                    }
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-        //Public TAG (0:전체공개, 1:친구공개, 2:나만공개)
-        rgrb = findViewById(R.id.rgrb);
-        rgrb.setOnCheckedChangeListener((group, checkedId) -> {
-            switch (checkedId){
-                case R.id.rbtn1:
-                    intPublic=0;
-                    break;
-                case R.id.rbtn2:
-                    intPublic=1;
-                    break;
-                case R.id.rbtn3:
-                    intPublic=2;
-                    break;
-            }
-        });
-        rgrb.check(R.id.rbtn2);
-
-        //BUTTON
-        btnOkay = findViewById(R.id.tvOkay);
-    }
-
-    private void onCheckPermission() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(this, "사진 업로드를 위해서는 권한 설정이 필요합니다", Toast.LENGTH_LONG).show();
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_1);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, PERMISSIONS_REQUEST_2);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case PERMISSIONS_REQUEST_1:
-                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                    Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();
-                }
-                break;
-            case PERMISSIONS_REQUEST_2:
-                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
-                    if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                        Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();
-                    }else{
-                        Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();
-                    }
-                }
-                break;
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                try {
-                    strAddress="";
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
-                    imgPost.setImageBitmap(bitmap);
-                    getGPS(data.getData());
-                    btnOkay.setEnabled(true);
-                    btnOkay.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_200)));
-                } catch (Exception e) {
-
-                }
-            } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "사진 선택 취소", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private void getGPS(Uri imgUri) {
-        lati=longi=0.0f;
-        String imagePath = "";
-        if(Build.VERSION.SDK_INT>=29) {
-            imagePath = getRealPathFromURI(imgUri);
-        }
-        else{
-            imagePath = getPathFromURI(imgUri);
-        }
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(imagePath);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        int exifDegree = exifOrientationToDegrees(exifOrientation);
-
-        String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-        String latitudeRef = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
-        String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-        String longitudeRef = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
-
-        if((latitude!=null) && (latitudeRef!=null)&&(longitude!=null)&&(longitudeRef!=null)){
-            if(latitudeRef.equals("N")) lati = convertToDegree(latitude);
-            else lati = 0-convertToDegree(latitude);
-
-            if(longitudeRef.equals("E")) longi = convertToDegree(longitude);
-            else longi = 0-convertToDegree(longitude);
-        }
-        strAddress = getCurrentAddress(lati, longi);
-        tvLocation.setText(strAddress);
-
-        if(!tvLocation.getText().equals("")&&!tvLocation.getText().equals("위치 정보 없음")){
-            cbLoc.setEnabled(true);
-            int black = ContextCompat.getColor(this, R.color.blackPrimary);
-            tvLocation.setTextColor(black);
-            cbLoc.setChecked(true);
-        }
-        else{
-            cbLoc.setEnabled(false);
-            int grey = ContextCompat.getColor(this, R.color.grey);
-            tvLocation.setTextColor(grey);
-            cbLoc.setChecked(false);
-        }
-
-        bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환
-        imgPost.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기
-    }
-
-    private String getPathFromURI(Uri uri) {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = managedQuery(uri, projection, null, null, null);
-        startManagingCursor(cursor);
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        return cursor.getString(column_index);
-    }
-
-    private String getCurrentAddress(Float lati, Float longi) {
-        double latitude = (double)lati;
-        double longitude = (double)longi;
-
-        Geocoder geocoder = new Geocoder(this);
-        List<Address> addresses = null;
-
-        try{
-            addresses = geocoder.getFromLocation(
-                    latitude,
-                    longitude,
-                    8
-            );
-        }catch(IOException ioException){
-            ioException.printStackTrace();
-        }
-        if(addresses!=null){
-            if(addresses.size()==0){
-                Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
-            }
-            else{
-                Address address = addresses.get(0);
-                return address.getAddressLine(0);
-            }
-        }
-        return "위치 정보 없음";
-    }
-
-    private Float convertToDegree(String stringDMS) {
-        Float result = null;
-        String[] DMS = stringDMS.split(",", 3);
-
-        String[] stringD = DMS[0].split("/", 2);
-        Double d0 = new Double(stringD[0]);
-        Double d1 = new Double(stringD[1]);
-        Double floatD = d0/d1;
-
-        String[] stringM = DMS[1].split("/", 2);
-        Double m0 = new Double(stringM[0]);
-        Double m1 = new Double(stringM[1]);
-        Double floatM = m0/m1;
-
-        String[] stringS = DMS[2].split("/", 2);
-        Double s0 = new Double(stringS[0]);
-        Double s1 = new Double(stringS[1]);
-        Double floatS = s0/s1;
-
-        result = new Float(floatD+(floatM/60)+(floatS/3600));
-
-        return result;
-    }
-
-    private int exifOrientationToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) { return 180; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) { return 270; } return 0;
-    }
-
-
-    private Bitmap rotate(Bitmap src, float degree) {
-        Matrix matrix = new Matrix(); // 회전 각도 셋팅
-        matrix.postRotate(degree);
-        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
-    }
-
-    private String getTime() {
-        long now = System.currentTimeMillis();
-        Date date = new Date(now);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-        String getTime = dateFormat.format(date);
-
-        return getTime;
-    }
-
-    private String getRealPathFromURI(Uri contentUri) {
-        if(Build.VERSION.SDK_INT>=29) {
-            contentUri = MediaStore.setRequireOriginal(contentUri);
-        }
-        int column_index=0;
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if(cursor.moveToFirst()){
-            column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        }
-        return cursor.getString(column_index);
-    }
-
-    public void onClickCancel(View view) {
-        finish();
-    }
-
-    public void onClickOkay(View view) {
-        String userID = PreferenceManager.getUserId(getApplicationContext());
-
-        // 내용 입력
-        etContents = (EditText)findViewById(R.id.etContents);
-        strContents = etContents.getText().toString();
-
-        //파이어베이스 데이터베이스 연동
-        firebaseDatabase = FirebaseDatabase.getInstance();
-
-        //DatabaseReference는 데이터베이스의 특정 위치로 연결
-        databaseReference = firebaseDatabase.getReference("Users").child(userID).child("post").push();
-        PostItem postItem = new PostItem(strAddress, lati, longi, arrTag, selected, intPublic, strContents, getTime());
-        databaseReference.setValue(postItem);
-
-        firebaseStorage = FirebaseStorage.getInstance();
-        storageReference = firebaseStorage  .getReference().child(userID).child(databaseReference.getKey());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
-        UploadTask uploadTask = storageReference.putBytes(data);
-        uploadTask.addOnFailureListener(e -> {
-            Toast.makeText(getApplicationContext(), "게시물 작성 실패", Toast.LENGTH_LONG).show();
-        }).addOnSuccessListener(taskSnapshot -> {
-            Toast.makeText(getApplicationContext(), "게시물 작성 성공", Toast.LENGTH_LONG).show();
-        });
-
-        finish();
-    }
-
-    public void hashTag(String tag, LinearLayout lv, ArrayList<String> arr, int code){
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-        layoutParams.bottomMargin = 10;
-        layoutParams.topMargin = 10;
-        layoutParams.leftMargin = 5;
-        layoutParams.rightMargin = 15;
-        LinearLayout ll = new LinearLayout(this);
-        ll.setBackground(ContextCompat.getDrawable(this, R.drawable.round_background));
-        ll.setPadding(20, 10, 10, 10);
-        ll.setGravity(Gravity.CENTER_VERTICAL);
-        ll.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_200)));
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        ll.setLayoutParams(layoutParams);
-
-        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-        layoutParams2.rightMargin = 5;
-        TextView tv = new TextView(this);
-        tv.setTextColor(getColor(R.color.teal_700));
-        tv.setTextSize(13);
-        if(code==0) tv.setText("# "+tag);
-        else tv.setText("@ "+tag);
-        tv.setLayoutParams(layoutParams2);
-        tv.setTypeface(null, Typeface.BOLD);
-
-        ll.addView(tv);
-
-        LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(40, 40, 1);
-        ImageView iv = new ImageView(this);
-        iv.setImageResource(R.drawable.ic_baseline_cancel_24);
-        iv.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_700)));
-        iv.setLayoutParams(layoutParams3);
-        iv.setOnClickListener(v -> {
-            arr.remove(tag);
-            ViewGroup parent = (ViewGroup) iv.getParent();
-            ViewGroup grandParent = (ViewGroup) parent.getParent();
-            grandParent.removeView(parent);
-        });
-
-        ll.addView(iv);
-
-        lv.addView(ll);
-    }
-
-}
+package com.example.photosnsproject;import androidx.annotation.NonNull;import androidx.annotation.RequiresApi;import androidx.appcompat.app.AppCompatActivity;import androidx.appcompat.content.res.AppCompatResources;import androidx.core.app.ActivityCompat;import androidx.core.content.ContextCompat;import androidx.recyclerview.widget.LinearLayoutManager;import androidx.recyclerview.widget.RecyclerView;import android.Manifest;import android.annotation.SuppressLint;import android.content.Intent;import android.content.pm.PackageManager;import android.content.res.ColorStateList;import android.database.Cursor;import android.graphics.Bitmap;import android.graphics.BitmapFactory;import android.graphics.Color;import android.graphics.Matrix;import android.graphics.Typeface;import android.location.Address;import android.location.Geocoder;import android.media.ExifInterface;import android.net.Uri;import android.os.Build;import android.os.Bundle;import android.provider.MediaStore;import android.util.Log;import android.view.Gravity;import android.view.View;import android.view.ViewGroup;import android.widget.AdapterView;import android.widget.ArrayAdapter;import android.widget.Button;import android.widget.CheckBox;import android.widget.EditText;import android.widget.ImageView;import android.widget.LinearLayout;import android.widget.RadioButton;import android.widget.RadioGroup;import android.widget.Spinner;import android.widget.TextView;import android.widget.Toast;import com.bumptech.glide.load.engine.Resource;import com.google.android.gms.auth.api.signin.internal.Storage;import com.google.android.gms.tasks.OnFailureListener;import com.google.android.gms.tasks.OnSuccessListener;import com.google.firebase.database.DataSnapshot;import com.google.firebase.database.DatabaseError;import com.google.firebase.database.DatabaseReference;import com.google.firebase.database.FirebaseDatabase;import com.google.firebase.database.ValueEventListener;import com.google.firebase.storage.FirebaseStorage;import com.google.firebase.storage.StorageReference;import com.google.firebase.storage.UploadTask;import java.io.ByteArrayOutputStream;import java.io.IOException;import java.io.InputStream;import java.lang.reflect.Array;import java.text.SimpleDateFormat;import java.util.ArrayList;import java.util.Date;import java.util.List;public class PlusPosting extends AppCompatActivity {    private ImageView imgPost;    private static final int REQUEST_CODE = 0;    private Spinner spinFriend;    private TextView tvLocation;    private CheckBox cbLoc;    private EditText etTag;    private TextView btnTag, btnOkay;    private LinearLayout llTag, llFriend;    private RadioGroup rgrb;    private ArrayList<String> arrTag, arrFriend, selected, arrNick;    private String strAddress, strContents;    private Float lati=0.0f, longi=0.0f;    private FirebaseDatabase firebaseDatabase;    private DatabaseReference databaseReference;    private FirebaseStorage firebaseStorage;    private StorageReference storageReference;    private Bitmap bitmap;    private static final int PERMISSIONS_REQUEST_1=1;    private static final int PERMISSIONS_REQUEST_2=2;    private EditText etContents;    private int intPublic;    private String userID;    @Override    protected void onCreate(Bundle savedInstanceState) {        super.onCreate(savedInstanceState);        setContentView(R.layout.activity_plus_posting);        init();    }    private void init() {        firebaseDatabase = FirebaseDatabase.getInstance();        firebaseStorage = FirebaseStorage.getInstance();        userID = PreferenceManager.getUserId(getApplicationContext());        //GET IMAGE        imgPost = findViewById(R.id.imgPost);        imgPost.setOnClickListener(v -> {            onCheckPermission();            Intent intent = new Intent(Intent.ACTION_PICK);            intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);            intent.setType("image/*");            startActivityForResult(intent, REQUEST_CODE);        });        tvLocation = findViewById(R.id.tvLocation);        cbLoc = findViewById(R.id.cbLoc);        if(tvLocation.getText().equals("")||tvLocation.getText().equals("위치 정보 없음")){            cbLoc.setEnabled(false);        }        cbLoc.setOnClickListener(v -> {            if(!((CheckBox)v).isChecked()){                int grey = ContextCompat.getColor(this, R.color.grey);                tvLocation.setTextColor(grey);            }else{                int black = ContextCompat.getColor(this, R.color.blackPrimary);                tvLocation.setTextColor(black);            }        });        //HASH TAG        etTag = findViewById(R.id.etTag);        btnTag = findViewById(R.id.btnTag);        llTag = findViewById(R.id.llTag);        arrTag = new ArrayList<>();        btnTag.setOnClickListener(v -> {            String strTag = etTag.getText().toString();            if(!strTag.equals("") && !arrTag.contains(strTag)){                arrTag.add(strTag);                etTag.setText("");                hashTag(strTag, llTag, arrTag, 0);            }        });        //Friend TAG        spinFriend = findViewById(R.id.spinFriend);        llFriend = findViewById(R.id.llFriend);        arrFriend = new ArrayList<>();        selected = new ArrayList<>();        arrNick = new ArrayList<>();        arrFriend.add("나의 친구 리스트");        arrNick.add(" ");        DatabaseReference myDB = firebaseDatabase.getReference();        DatabaseReference subDB = firebaseDatabase.getReference();        myDB.child("Follow").child("Following").child(userID).orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {            @Override            public void onDataChange(@NonNull DataSnapshot snapshot) {                for(DataSnapshot ds:snapshot.getChildren()){                    arrFriend.add(ds.getKey());                    subDB.child("Users").orderByKey().equalTo(ds.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {                        @Override                        public void onDataChange(@NonNull DataSnapshot snapshot) {                            for(DataSnapshot ds: snapshot.getChildren()){                                arrNick.add(ds.child("nick").getValue().toString());                            }                        }                        @Override                        public void onCancelled(@NonNull DatabaseError error) {                        }                    });                }                CustomSpinnerAdapter spinnerAdapter = new CustomSpinnerAdapter(getApplicationContext(), arrFriend);                spinFriend.setAdapter(spinnerAdapter);            }            @Override            public void onCancelled(@NonNull DatabaseError error) {            }        });        spinFriend.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {            @Override            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {                if(position!=0){                    String strFriend = arrFriend.get(position);                    if(!strFriend.equals("")&& !selected.contains(strFriend)){                        selected.add(arrFriend.get(position));                        hashTag(String.valueOf(position), llFriend, selected, 1);                    }                }            }            @Override            public void onNothingSelected(AdapterView<?> parent) {            }        });        //Public TAG (0:전체공개, 1:친구공개, 2:나만공개)        rgrb = findViewById(R.id.rgrb);        rgrb.setOnCheckedChangeListener((group, checkedId) -> {            switch (checkedId){                case R.id.rbtn1:                    intPublic=0;                    break;                case R.id.rbtn2:                    intPublic=1;                    break;                case R.id.rbtn3:                    intPublic=2;                    break;            }        });        rgrb.check(R.id.rbtn2);        //BUTTON        btnOkay = findViewById(R.id.tvOkay);    }    private void onCheckPermission() {        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){            Toast.makeText(this, "사진 업로드를 위해서는 권한 설정이 필요합니다", Toast.LENGTH_LONG).show();            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_1);        }        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)!= PackageManager.PERMISSION_GRANTED){                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_MEDIA_LOCATION}, PERMISSIONS_REQUEST_2);            }        }    }    @Override    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {        super.onRequestPermissionsResult(requestCode, permissions, grantResults);        switch (requestCode){            case PERMISSIONS_REQUEST_1:                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){                    Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();                }else{                    Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();                }                break;            case PERMISSIONS_REQUEST_2:                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){                    if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){                        Toast.makeText(this, "앱 실행을 위한 권한이 설정되었습니다", Toast.LENGTH_LONG).show();                    }else{                        Toast.makeText(this, "앱 실행을 위한 권한 설정이 취소되었습니다", Toast.LENGTH_LONG).show();                    }                }                break;        }    }    @Override    protected void onActivityResult(int requestCode, int resultCode, Intent data) {        super.onActivityResult(requestCode, resultCode, data);        if (requestCode == REQUEST_CODE) {            if (resultCode == RESULT_OK) {                try {                    strAddress="";                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());                    imgPost.setImageBitmap(bitmap);                    getGPS(data.getData());                    btnOkay.setEnabled(true);                    btnOkay.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_200)));                } catch (Exception e) {                }            } else if (resultCode == RESULT_CANCELED) {                Toast.makeText(this, "사진 선택 취소", Toast.LENGTH_LONG).show();            }        }    }    private void getGPS(Uri imgUri) {        lati=longi=0.0f;        String imagePath = "";        if(Build.VERSION.SDK_INT>=29) {            imagePath = getRealPathFromURI(imgUri);        }        else{            imagePath = getPathFromURI(imgUri);        }        ExifInterface exif = null;        try {            exif = new ExifInterface(imagePath);        }        catch (IOException e) {            e.printStackTrace();        }        int exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);        int exifDegree = exifOrientationToDegrees(exifOrientation);        String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);        String latitudeRef = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);        String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);        String longitudeRef = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);        if((latitude!=null) && (latitudeRef!=null)&&(longitude!=null)&&(longitudeRef!=null)){            if(latitudeRef.equals("N")) lati = convertToDegree(latitude);            else lati = 0-convertToDegree(latitude);            if(longitudeRef.equals("E")) longi = convertToDegree(longitude);            else longi = 0-convertToDegree(longitude);        }        strAddress = getCurrentAddress(lati, longi);        tvLocation.setText(strAddress);        if(!tvLocation.getText().equals("")&&!tvLocation.getText().equals("위치 정보 없음")){            cbLoc.setEnabled(true);            int black = ContextCompat.getColor(this, R.color.blackPrimary);            tvLocation.setTextColor(black);            cbLoc.setChecked(true);        }        else{            cbLoc.setEnabled(false);            int grey = ContextCompat.getColor(this, R.color.grey);            tvLocation.setTextColor(grey);            cbLoc.setChecked(false);        }        bitmap = BitmapFactory.decodeFile(imagePath);//경로를 통해 비트맵으로 전환        imgPost.setImageBitmap(rotate(bitmap, exifDegree));//이미지 뷰에 비트맵 넣기    }    private String getPathFromURI(Uri uri) {        String[] projection = { MediaStore.Images.Media.DATA };        Cursor cursor = managedQuery(uri, projection, null, null, null);        startManagingCursor(cursor);        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);        cursor.moveToFirst();        return cursor.getString(column_index);    }    private String getCurrentAddress(Float lati, Float longi) {        double latitude = (double)lati;        double longitude = (double)longi;        Geocoder geocoder = new Geocoder(this);        List<Address> addresses = null;        try{            addresses = geocoder.getFromLocation(                    latitude,                    longitude,                    8            );        }catch(IOException ioException){            ioException.printStackTrace();        }        if(addresses!=null){            if(addresses.size()==0){                Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();            }            else{                Address address = addresses.get(0);                return address.getAddressLine(0);            }        }        return "위치 정보 없음";    }    private Float convertToDegree(String stringDMS) {        Float result = null;        String[] DMS = stringDMS.split(",", 3);        String[] stringD = DMS[0].split("/", 2);        Double d0 = new Double(stringD[0]);        Double d1 = new Double(stringD[1]);        Double floatD = d0/d1;        String[] stringM = DMS[1].split("/", 2);        Double m0 = new Double(stringM[0]);        Double m1 = new Double(stringM[1]);        Double floatM = m0/m1;        String[] stringS = DMS[2].split("/", 2);        Double s0 = new Double(stringS[0]);        Double s1 = new Double(stringS[1]);        Double floatS = s0/s1;        result = new Float(floatD+(floatM/60)+(floatS/3600));        return result;    }    private int exifOrientationToDegrees(int exifOrientation) {        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) { return 180; }        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) { return 270; } return 0;    }    private Bitmap rotate(Bitmap src, float degree) {        Matrix matrix = new Matrix(); // 회전 각도 셋팅        matrix.postRotate(degree);        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);    }    private String getTime() {        long now = System.currentTimeMillis();        Date date = new Date(now);        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");        String getTime = dateFormat.format(date);        return getTime;    }    private String getRealPathFromURI(Uri contentUri) {        if(Build.VERSION.SDK_INT>=29) {            contentUri = MediaStore.setRequireOriginal(contentUri);        }        int column_index=0;        String[] proj = {MediaStore.Images.Media.DATA};        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);        if(cursor.moveToFirst()){            column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);        }        return cursor.getString(column_index);    }    public void onClickCancel(View view) {        finish();    }    public void onClickOkay(View view) {        // 내용 입력        etContents = (EditText)findViewById(R.id.etContents);        strContents = etContents.getText().toString();        //DatabaseReference는 데이터베이스의 특정 위치로 연결        databaseReference = firebaseDatabase.getReference("Users").child(userID).child("post").push();        PostItem postItem = new PostItem(strAddress, lati, longi, arrTag, selected, intPublic, strContents, getTime());        databaseReference.setValue(postItem);        storageReference = firebaseStorage.getReference().child(userID).child(databaseReference.getKey());        ByteArrayOutputStream baos = new ByteArrayOutputStream();        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);        byte[] data = baos.toByteArray();        UploadTask uploadTask = storageReference.putBytes(data);        uploadTask.addOnFailureListener(e -> {            Toast.makeText(getApplicationContext(), "게시물 작성 실패", Toast.LENGTH_LONG).show();        }).addOnSuccessListener(taskSnapshot -> {            Toast.makeText(getApplicationContext(), "게시물 작성 성공", Toast.LENGTH_LONG).show();        });        finish();    }    public void hashTag(String tag, LinearLayout lv, ArrayList<String> arr, int code){        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);        layoutParams.bottomMargin = 10;        layoutParams.topMargin = 10;        layoutParams.leftMargin = 5;        layoutParams.rightMargin = 15;        LinearLayout ll = new LinearLayout(this);        ll.setBackground(ContextCompat.getDrawable(this, R.drawable.round_background));        ll.setPadding(20, 10, 10, 10);        ll.setGravity(Gravity.CENTER_VERTICAL);        ll.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_200)));        ll.setOrientation(LinearLayout.HORIZONTAL);        ll.setLayoutParams(layoutParams);        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1);        layoutParams2.rightMargin = 5;        TextView tv = new TextView(this);        tv.setTextColor(getColor(R.color.teal_700));        tv.setTextSize(13);        if(code==0) tv.setText("# "+tag);        else {            tv.setText("@ "+ arrNick.get(Integer.parseInt(tag)));        }        tv.setLayoutParams(layoutParams2);        tv.setTypeface(null, Typeface.BOLD);        ll.addView(tv);        LinearLayout.LayoutParams layoutParams3 = new LinearLayout.LayoutParams(40, 40, 1);        ImageView iv = new ImageView(this);        iv.setImageResource(R.drawable.ic_baseline_cancel_24);        iv.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.teal_700)));        iv.setLayoutParams(layoutParams3);        iv.setOnClickListener(v -> {            if(code==0) arr.remove(tag);            else{                arr.remove(arrFriend.get(Integer.parseInt(tag)));            }            ViewGroup parent = (ViewGroup) iv.getParent();            ViewGroup grandParent = (ViewGroup) parent.getParent();            grandParent.removeView(parent);        });        ll.addView(iv);        lv.addView(ll);    }}

@@ -121,6 +121,7 @@ public class SubMapFragment extends Fragment implements OnMapReadyCallback{
             StorageReference storageReference = reference.child(path.get(i));
             storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
                 LatLng latLng = new LatLng(latitude, longitude);
+                Log.e("@@", uri.toString()+"");
                 Glide.with(context).
                         load(uri)
                         .override(2000,2000)
