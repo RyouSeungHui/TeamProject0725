@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -39,6 +46,9 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
     private StorageReference storageReference;
     private StorageReference submitProfile;
 
+
+    private FirebaseDatabase database=FirebaseDatabase.getInstance();
+    private DatabaseReference db=database.getReference();
 
     public PostingAdapter(ArrayList<PostItem> posting, Context context,ArrayList<String> postname,ArrayList<String> postuser) {
         this.posting = posting;
@@ -151,6 +161,76 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 tv_tag.setLayoutParams(layoutParams);
                 tv_tag.setTypeface(null, Typeface.BOLD);
 
+                tv_tag.setClickable(true);
+
+                String tag = posting.get(position).getTag().get(i);
+
+                tv_tag.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        ArrayList<PostItem> item;
+                        ArrayList<String> user_id;
+                        ArrayList<String> post_id;
+
+                        item = new ArrayList<>();
+                        user_id = new ArrayList<>();
+                        post_id = new ArrayList<>();
+
+                        db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                item.clear();
+                                user_id.clear();
+                                post_id.clear();
+                                for (DataSnapshot sn : snapshot.getChildren()) {
+                                    User user_Adapter = sn.getValue(User.class);
+                                    String strId_Adapter = user_Adapter.getId();
+                                    db.child("Users").child(strId_Adapter).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot sn2 : snapshot.getChildren()) {
+                                                PostItem postitem_Adapter = sn2.getValue(PostItem.class);
+
+                                                try {
+                                                    ArrayList<String> arrTag_Adapter = postitem_Adapter.getTag();
+
+                                                    if (arrTag_Adapter.equals(tag)) {
+                                                        item.add(postitem_Adapter);
+                                                        user_id.add(strId_Adapter);
+                                                        post_id.add(sn2.getKey());
+                                                    }
+                                                } catch (NullPointerException e) {
+
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                        }
+                                    });
+                                }
+                            }
+
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
+                        TagPostingFragment tagPostingFragment = new TagPostingFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelableArrayList("postitem",(ArrayList<? extends Parcelable>) item);
+                        bundle.putStringArrayList("user_id",user_id);
+                        bundle.putStringArrayList("post_id",post_id);
+                        tagPostingFragment.setArguments(bundle);
+                        ((MainActivity)context).follow(tagPostingFragment);
+
+                    }
+                });
+
                 holder.ll_tag.addView(tv_tag);
             }
         } catch(NullPointerException e) {
@@ -165,9 +245,46 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 TextView tv_tag = new TextView(context);
                 tv_tag.setTextColor(Color.parseColor("#476600"));
                 tv_tag.setTextSize(14);
-                tv_tag.setText("@ " + posting.get(position).getFriend().get(i));
+
                 tv_tag.setLayoutParams(layoutParams);
                 tv_tag.setTypeface(null, Typeface.BOLD);
+                tv_tag.setClickable(true);
+
+                // 아래 사항 조치후 삭제할 line
+                tv_tag.setText("@ " + posting.get(position).getFriend().get(i));
+
+
+                /*   <- PostItem - Friends ArrayList 이름을 id로 수정한 후 적용
+                String user_id = posting.get(position).getFriend().get(i);
+
+                db.child("Users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        String user_name=user.getId();
+
+                        tv_tag.setText("@ " + user_name);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+                tv_tag.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ProfileFragment profileFragment = new ProfileFragment();
+                        Bundle bundle = new Bundle(1);
+                        bundle.putString("id",user_id);
+                        profileFragment.setArguments(bundle);
+                        ((MainActivity)context).follow(profileFragment);
+                    }
+                });
+
+                */
 
                 holder.ll_friend.addView(tv_tag);
             }
