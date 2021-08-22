@@ -192,8 +192,8 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                                                     for(int k=0;k<arrTag_Adapter.size();k++) {
                                                         if (arrTag_Adapter.get(k).equals(tag)) {
                                                             adding(postitem_Adapter,strId_Adapter,sn2.getKey());
+                                                            break;
                                                         }
-                                                        break;
                                                     }
                                                 } catch (NullPointerException e) {
                                                 }
@@ -291,7 +291,6 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
         TextView mention;
         LinearLayout ll_friend;
 
-        TextView test;
 
         public postviewholder(@NonNull View itemView) {
             super(itemView);
@@ -302,7 +301,6 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
             this.ll_tag=itemView.findViewById(R.id.ll_tag);
             this.mention=itemView.findViewById(R.id.mention);
             this.ll_friend=itemView.findViewById(R.id.ll_friend);
-            this.test=itemView.findViewById(R.id.test1);
         }
     }
 
