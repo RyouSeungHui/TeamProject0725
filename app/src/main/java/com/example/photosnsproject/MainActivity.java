@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private MyFragment myFragment;
     private ProfileFragment profileFragment;
     private RandomFragment randomFragment;
+    private TagPostingFragment tagPostingFragment;
     private ViewPager viewPager;
 
     private ImageView[] imgGroup;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         myFragment = new MyFragment();
         randomFragment = new RandomFragment();
         profileFragment= new ProfileFragment();
+        tagPostingFragment = new TagPostingFragment();
 
 
         fragmentTransaction = fragmentManager.beginTransaction();
