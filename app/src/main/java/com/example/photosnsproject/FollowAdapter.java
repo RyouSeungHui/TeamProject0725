@@ -36,7 +36,8 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
     private int index;
     private FirebaseStorage storage=FirebaseStorage.getInstance();
     private StorageReference storageReference=storage.getReference();
-
+    private String userID;
+    private MyFragment myFragment=new MyFragment();
     private ProfileFragment profileFragment=new ProfileFragment();
 
 
@@ -53,6 +54,7 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
     public FollowViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.follow_profile,parent,false);
         FollowAdapter.FollowViewHolder holder = new FollowAdapter.FollowViewHolder(view);
+        userID=PreferenceManager.getUserId(view.getContext());
         return holder;
     }
 
@@ -79,19 +81,16 @@ public class FollowAdapter extends RecyclerView.Adapter<FollowAdapter.FollowView
             @Override
             public void onClick(View view) {
                 String id = idlist.get(position);
-                Bundle bundle = new Bundle(2);
-                bundle.putString("id",id);
-
-                if(index==1) {
-                    bundle.putInt("flag",1);
-                    profileFragment.setArguments(bundle);
-                    ((Follow_main)context).follow(profileFragment);
-                }
-                else{
-                    bundle.putInt("flag",0);
+                if(!(id.equals(userID))) {
+                    Bundle bundle = new Bundle(2);
+                    bundle.putString("id", id);
                     profileFragment.setArguments(bundle);
                     ((MainActivity) context).follow(profileFragment);
                 }
+                else{
+                    ((MainActivity) context).follow(myFragment);
+                }
+
 
 
 

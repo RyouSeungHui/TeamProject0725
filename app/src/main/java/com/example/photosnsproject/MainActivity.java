@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
     private ProfileFragment profileFragment;
     private RandomFragment randomFragment;
     private ViewPager viewPager;
-
     private ImageView[] imgGroup;
     private Drawable[] drawables_g, drawables_b;
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         myFragment = new MyFragment();
         randomFragment = new RandomFragment();
         profileFragment= new ProfileFragment();
-
+        userID =PreferenceManager.getUserId(getApplicationContext());
 
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flFragment, friendsFragment).commitAllowingStateLoss();
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent,1);
     }
 
-    public void searchtag2(View view) {
+    public void searchtag(View view) {
 
         Intent intent = new Intent(this,SearchTag.class);
         startActivityForResult(intent,2);
@@ -130,11 +130,17 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode==1){
             if(resultCode==RESULT_OK){
                 String id=data.getExtras().getString("id");
-                Bundle bundle = new Bundle(1);
-                bundle.putString("id",id);
-                profileFragment.setArguments(bundle);
-                fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.flFragment, profileFragment).commitAllowingStateLoss();
+                if(!(id.equals(userID))) {
+                    Bundle bundle = new Bundle(1);
+                    bundle.putString("id", id);
+                    profileFragment.setArguments(bundle);
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.flFragment, profileFragment).commitAllowingStateLoss();
+                }
+                else{
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.flFragment, myFragment).commitAllowingStateLoss();
+                }
             }
         }
 

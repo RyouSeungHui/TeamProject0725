@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileFragment extends Fragment implements View.OnClickListener {
+public class    ProfileFragment extends Fragment implements View.OnClickListener {
 
 
     private View view;
@@ -78,7 +78,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         profile=view.findViewById(R.id.profile);
         pf_id = (TextView) view.findViewById(R.id.pf_id); //2
         string_pf_id = getArguments().getString("id");
-        flag=getArguments().getInt("flag");
         pf_follow_btn=(Button) view.findViewById(R.id.pf_follow_btn);
         pf_gallery=(view).findViewById(R.id.pf_gallery);
         pf_follower=(view).findViewById(R.id.pf_follower);
@@ -189,21 +188,21 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         StorageReference mgreference=storageReference.child(string_pf_id);
 
         mgreference.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-                    @Override
-                    public void onSuccess(ListResult listResult) {
-                        for (StorageReference item : listResult.getItems()) {
-                            item.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    imagelist.add(uri.toString());
-                                    adapter.notifyDataSetChanged();
-                                    Log.e("Itemvalue",uri.toString());
-                                }
-                            });
-
+            @Override
+            public void onSuccess(ListResult listResult) {
+                for (StorageReference item : listResult.getItems()) {
+                    item.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            imagelist.add(uri.toString());
+                            adapter.notifyDataSetChanged();
+                            Log.e("Itemvalue",uri.toString());
                         }
-                    }
-                });
+                    });
+
+                }
+            }
+        });
 
         //팔로우 버튼
 
@@ -284,28 +283,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 break;
 
             case R.id.pf_follower:
+                FollowFragment followFragment=new FollowFragment(string_pf_id,0);
+                ((MainActivity) context).follow(followFragment);
 
-                if(flag==0) {
-                    FollowFragment followFragment=new FollowFragment(string_pf_id,0,0);
-                    ((MainActivity) context).follow(followFragment);
-                }
-                else{
-                    FollowFragment followFragment=new FollowFragment(string_pf_id,0,1);
-                    ((Follow_main)context).follow(followFragment);
-                }
                 break;
 
             case R.id.pf_following:
 
+                FollowFragment followFragment2=new FollowFragment(string_pf_id,1);
+                ((MainActivity) context).follow(followFragment2);
 
-                if(flag==0) {
-                    FollowFragment followFragment2=new FollowFragment(string_pf_id,1,0);
-                    ((MainActivity) context).follow(followFragment2);
-                }
-                else{
-                    FollowFragment followFragment2=new FollowFragment(string_pf_id,1,1);
-                    ((Follow_main)context).follow(followFragment2);
-                }
                 break;
 
         }

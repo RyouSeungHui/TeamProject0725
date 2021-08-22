@@ -36,6 +36,7 @@ public class FollowerFragment extends Fragment{
     private ArrayList<String> nicklist;
     private ArrayList<String> idlist;
     private String userID;
+    private String page;
     /*
     public static FollowerFragment newInstance() {
         return new FollowerFragment();
@@ -43,9 +44,8 @@ public class FollowerFragment extends Fragment{
 
 
 
-    public FollowerFragment(String id, int index) {
+    public FollowerFragment(String id) {
         this.userID=id;
-        this.index=index;
 
     }
 

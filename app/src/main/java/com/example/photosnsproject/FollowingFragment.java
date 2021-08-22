@@ -45,10 +45,9 @@ public class FollowingFragment extends Fragment {
     }*/
 
 
-    public FollowingFragment(String id, int index) {
+    public FollowingFragment(String id) {
 
         this.userID=id;
-        this.index=index;
     }
 
 

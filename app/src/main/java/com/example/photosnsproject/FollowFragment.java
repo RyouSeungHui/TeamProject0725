@@ -20,14 +20,13 @@ import java.util.zip.Inflater;
 
 public class FollowFragment extends Fragment {
 
-    public FollowFragment(String id, int page,int index) {
+    public FollowFragment(String id, int page) {
 
         this.id=id;
         this.page=page;
-        this.index=index;
     }
     String id;
-    int page, index;
+    int page;
     private View view;
     private Context context;
 
@@ -44,8 +43,8 @@ public class FollowFragment extends Fragment {
         ViewPager vp = (ViewPager) (view).findViewById(R.id.Viewpager);
         Follow_ViewPager_Adapter adapter = new  Follow_ViewPager_Adapter(getChildFragmentManager());
 
-        FollowerFragment followerFragment=new FollowerFragment(id,index);
-        FollowingFragment followingFragment=new FollowingFragment(id,index);
+        FollowerFragment followerFragment=new FollowerFragment(id);
+        FollowingFragment followingFragment=new FollowingFragment(id);
 
         adapter.addFragment(followerFragment,"팔로워");
         adapter.addFragment(followingFragment,"팔로잉");

@@ -20,6 +20,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
 
 
+
     public GalleryAdapter(ArrayList<String> imagelist, Context context){
         this.imagelist=imagelist;
         this.context=context;
@@ -30,6 +31,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     public GalleryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_profile,parent,false);
        GalleryAdapter.GalleryViewHolder holder = new GalleryAdapter.GalleryViewHolder(view);
+
         return holder;
     }
 
