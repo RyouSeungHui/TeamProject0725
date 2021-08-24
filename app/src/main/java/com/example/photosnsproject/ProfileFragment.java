@@ -95,7 +95,7 @@ public class    ProfileFragment extends Fragment implements View.OnClickListener
         layoutManager = new GridLayoutManager(view.getContext(),3);
         recyclerView.setLayoutManager(layoutManager);
         imagelist = new ArrayList<>();
-        adapter = new GalleryAdapter(imagelist, context);
+        adapter = new GalleryAdapter(imagelist, context,string_pf_id);
         recyclerView.setAdapter(adapter);
         userID =PreferenceManager.getUserId(view.getContext());
 
@@ -185,6 +185,22 @@ public class    ProfileFragment extends Fragment implements View.OnClickListener
 
         //https://www.geeksforgeeks.org/how-to-view-all-the-uploaded-images-in-firebase-storage/
         //자기 프로필 게시물
+
+        db.child("Users").child(string_pf_id).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot sn : snapshot.getChildren()) {
+                    imagelist.add(sn.getKey());
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        /*
         StorageReference mgreference=storageReference.child(string_pf_id);
 
         mgreference.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
@@ -203,6 +219,8 @@ public class    ProfileFragment extends Fragment implements View.OnClickListener
                 }
             }
         });
+
+         */
 
         //팔로우 버튼
 

@@ -98,7 +98,7 @@ public class MyFragment extends Fragment implements View.OnClickListener {
         layoutManager = new GridLayoutManager(view.getContext(),3);
         recyclerView.setLayoutManager(layoutManager);
         imagelist = new ArrayList<>();
-        adapter = new GalleryAdapter(imagelist, context);
+        adapter = new GalleryAdapter(imagelist,context,userID);
         recyclerView.setAdapter(adapter);
         mf_id.setText(userID);
         follow_main=new Follow_main();
@@ -181,6 +181,21 @@ public class MyFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        db.child("Users").child(userID).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot sn : snapshot.getChildren()) {
+                    imagelist.add(sn.getKey());
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        /*
         StorageReference mgreference=storageReference.child(userID);
 
 
@@ -198,7 +213,7 @@ public class MyFragment extends Fragment implements View.OnClickListener {
                 }
             }
         });
-
+        */
 
 
         setFloatingButton();
