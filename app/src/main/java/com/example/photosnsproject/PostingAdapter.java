@@ -139,6 +139,19 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
             }
         });
 
+        holder.post_img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PostInfoFragment postInfoFragment = new PostInfoFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("user_id",postuser.get(position));
+                bundle.putString("post_id",postname.get(position));
+                postInfoFragment.setArguments(bundle);
+                ((MainActivity)context).follow(postInfoFragment);
+
+            }
+        });
+
         String user_path = "profile/"+postuser.get(position)+".png";
         submitProfile = storageReference.child(user_path);
         submitProfile.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -231,8 +244,6 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 tv_tag.setLayoutParams(layoutParams);
                 tv_tag.setTypeface(null, Typeface.BOLD);
                 tv_tag.setClickable(true);
-
-                // 아래 사항 조치후 삭제할 line
 
 
 

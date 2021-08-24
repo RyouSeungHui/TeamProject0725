@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ProfileFragment profileFragment;
     private TagPostingFragment tagPostingFragment;
     private RandomFragment randomFragment;
+    private PostInfoFragment postInfoFragment;
     private ViewPager viewPager;
 
     private ImageView[] imgGroup;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         randomFragment = new RandomFragment();
         profileFragment= new ProfileFragment();
         tagPostingFragment = new TagPostingFragment();
+        postInfoFragment = new PostInfoFragment();
 
 
         fragmentTransaction = fragmentManager.beginTransaction();
