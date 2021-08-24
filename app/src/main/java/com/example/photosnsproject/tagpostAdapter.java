@@ -2,6 +2,7 @@ package com.example.photosnsproject;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,15 +21,17 @@ import java.util.ArrayList;
 
 public class tagpostAdapter extends RecyclerView.Adapter<tagpostAdapter.tagViewHolder>{
 
-    private ArrayList<String> imagelist;
+    private ArrayList<String> userlist;
+    private ArrayList<String> postlist;
     private Context context;
 
     private FirebaseStorage storage;
     private StorageReference storageReference;
     private StorageReference submitProfile;
 
-    public tagpostAdapter(ArrayList<String> imagelist, Context context) {
-        this.imagelist = imagelist;
+    public tagpostAdapter(ArrayList<String> userlist,ArrayList<String> postlist, Context context) {
+        this.userlist =userlist;
+        this.postlist =postlist;
         this.context = context;
     }
 
@@ -46,7 +49,7 @@ public class tagpostAdapter extends RecyclerView.Adapter<tagpostAdapter.tagViewH
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-        String user_path = imagelist.get(position);
+        String user_path = userlist.get(position)+"/"+postlist.get(position);
         submitProfile = storageReference.child(user_path);
         submitProfile.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -61,12 +64,23 @@ public class tagpostAdapter extends RecyclerView.Adapter<tagpostAdapter.tagViewH
             public void onFailure(@NonNull Exception e) {
             }
         });
+        holder.mg_image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PostInfoFragment postInfoFragment = new PostInfoFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("user_id",userlist.get(position));
+                bundle.putString("post_id",postlist.get(position));
+                postInfoFragment.setArguments(bundle);
+                ((MainActivity)context).follow(postInfoFragment);
+            }
+        });
 
     }
 
     @Override
     public int getItemCount() {
-        return (imagelist !=null ? imagelist.size() : 0);
+        return (userlist !=null ? userlist.size() : 0);
     }
 
     public class tagViewHolder extends RecyclerView.ViewHolder {

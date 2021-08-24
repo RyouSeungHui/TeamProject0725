@@ -50,7 +50,7 @@ public class TagPostingFragment extends Fragment {
         recyclerView.setHasFixedSize(true); //정리한번
         layoutManager = new GridLayoutManager(view.getContext(),3);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new tagpostAdapter(imagelist, context);
+        adapter = new tagpostAdapter(user_id,post_id, context);
         recyclerView.setAdapter(adapter);
 
 
