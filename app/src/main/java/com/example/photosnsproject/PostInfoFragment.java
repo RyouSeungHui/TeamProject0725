@@ -1,19 +1,23 @@
 package com.example.photosnsproject;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -27,7 +31,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PostInfoFragment extends Fragment {
     private View view;
@@ -41,6 +47,9 @@ public class PostInfoFragment extends Fragment {
     private TextView user_name;  //게시자 이름
 
     private ImageView heart;    //좋아요버튼
+    private TextView tvLike;
+    private boolean like = false;
+    private long likeNum;
     private ImageView comment;  //댓글버튼
 
     private LinearLayout ll_hash; //해쉬태그
@@ -62,7 +71,6 @@ public class PostInfoFragment extends Fragment {
         context = getActivity();
         view = inflater.inflate(R.layout.postinfofragment, container, false);
 
-
         init();
 
         ImageLoad();
@@ -70,7 +78,6 @@ public class PostInfoFragment extends Fragment {
         CallHashtag();
 
         SetOnClick();  //승희 파트
-
 
         return view;
     }
@@ -84,6 +91,7 @@ public class PostInfoFragment extends Fragment {
         user_name = (view).findViewById(R.id.user_name);
 
         heart = (view).findViewById(R.id.post_heart);
+        tvLike = (view).findViewById(R.id.tvLike);
         comment = (view).findViewById(R.id.post_comment);
 
         ll_hash = (view).findViewById(R.id.ll_tag);
@@ -250,12 +258,57 @@ public class PostInfoFragment extends Fragment {
     }
 
     public void SetOnClick() {
-        //좋아요 버튼 click
-        heart.setOnClickListener(new View.OnClickListener() {
+        String myID = PreferenceManager.getUserId(context);
+        db.child("Users").child(user_id).child("post").child(post_id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                heart.setImageResource(R.drawable.full_heart);  //빈 하트는 R.drawable.empty_heart
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild("like")){ //좋아요 있을때
+                    if (snapshot.child("like").hasChild(myID)) {
+                        heart.setImageResource(R.drawable.full_favorite);
+                        like = true;
+                    }
+                    likeNum = snapshot.child("like").getChildrenCount();
+                    tvLike.setText(likeNum+"명이 이 글을 좋아합니다");
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
+        //좋아요 버튼 click
+        heart.setOnClickListener(v -> {
+            if(like){ //현재 좋아요
+                db.child("Users").child(user_id).child("post").child(post_id).child("like").child(myID).removeValue();
+                heart.setImageResource(R.drawable.empty_favorite);
+                likeNum--;
+                if(likeNum==0) tvLike.setText("좋아요를 눌러주세요!");
+                else tvLike.setText(likeNum+"명이 이 글을 좋아합니다");
+                like=false;
+            }
+            else{ //현재 안좋아요
+                db.child("Users").child(user_id).child("post").child(post_id).child("like").child(myID).setValue(getCurrentTime());
+                heart.setImageResource(R.drawable.full_favorite);
+                likeNum++;
+                tvLike.setText(likeNum+"명이 이 글을 좋아합니다");
+                like=true;
+            }
+        });
+
+        tvLike.setOnClickListener(v -> {
+            ArrayList<String> likePeople= new ArrayList<String>();
+            if(likeNum>0){
+                db.child("Users").child(user_id).child("post").child(post_id).child("like").orderByValue().addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot ds: snapshot.getChildren()) likePeople.add(ds.getKey());
+                        LikeList likeList = new LikeList(likePeople);
+                        likeList.show(getActivity().getSupportFragmentManager(), likeList.getTag());
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
             }
         });
 
@@ -266,6 +319,13 @@ public class PostInfoFragment extends Fragment {
 
             }
         });
+    }
+
+    private String getCurrentTime() {
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        return dateFormat.format(date);
     }
 
     public void transport() {
@@ -284,5 +344,4 @@ public class PostInfoFragment extends Fragment {
         userlistfortag.add(strId_Adapter);
         postlistfortag.add(postkey);
     }
-
 }

@@ -51,14 +51,26 @@
             android:id="@+id/post_heart"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/empty_heart"
+            android:src="@drawable/empty_favorite"
             android:clickable="true"
             android:onClick="set_heart"/>
+
+        <TextView
+            android:id="@+id/tvLike"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginLeft="5dp"
+            android:textStyle="bold"
+            android:textSize="15dp"
+            android:textColor="@color/blackPrimary"
+            android:gravity="center"
+            android:text="좋아요를 눌러주세요!" />
 
         <ImageView
             android:id="@+id/post_comment"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
             android:src="@drawable/ic_baseline_comment_24"
             android:onClick="open_comment"
             android:clickable="true"/>

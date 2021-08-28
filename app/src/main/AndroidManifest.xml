@@ -16,7 +16,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PhotoSNSProject">
-        <activity android:name=".Follow_main"></activity>
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -40,8 +39,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".Signin" />
-        <activity android:name=".MainActivity"
-            android:windowSoftInputMode="adjustNothing"/>
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustNothing" />
     </application>
 
 </manifest>
