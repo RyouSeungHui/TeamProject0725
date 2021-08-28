@@ -316,7 +316,12 @@ public class PostInfoFragment extends Fragment {
         comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                CommentFragment commentFragment = new CommentFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("user_id",user_id);
+                bundle.putString("post_id",post_id);
+                commentFragment.setArguments(bundle);
+                ((MainActivity)context).follow(commentFragment);
             }
         });
     }
