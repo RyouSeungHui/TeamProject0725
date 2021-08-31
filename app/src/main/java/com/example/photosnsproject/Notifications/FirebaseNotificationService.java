@@ -30,12 +30,10 @@ import java.util.Map;
 
 public class FirebaseNotificationService extends FirebaseMessagingService {
 
-    int uidflag = 0;
 
-    String text;
     String post_id;
     String user_id;
-    PostInfoFragment postInfoFragment = new PostInfoFragment();
+    String send_id;
     private String userID;
     public FirebaseNotificationService() {
     }
@@ -49,9 +47,9 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
 
         if (data_notify != null) {
             Log.e("FCMService", "received");
-            text = data_notify.get("text");
             post_id = data_notify.get("post_id");
             user_id = data_notify.get("user_id");
+            send_id=data_notify.get("send_id");
             userID = PreferenceManager.getUserId(getApplicationContext());
             final String userID = PreferenceManager.getUserId(getApplicationContext());
 
@@ -76,7 +74,7 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
                 NotificationCompat.Builder notificationBuilder =
                         new NotificationCompat.Builder(getApplicationContext(), channelId)
                                 .setSmallIcon(R.mipmap.ic_launcher)
-                                .setContentTitle(text)
+                                .setContentTitle(send_id+"님이 댓글을 작성하였습니다.")
                                 .setAutoCancel(true)
                                 .setSound(defaultUri)
                                 .setContentIntent(pendingIntent);

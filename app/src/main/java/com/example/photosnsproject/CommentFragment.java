@@ -69,6 +69,7 @@ public class CommentFragment extends Fragment {
         db.child("Users").child(user_id).child("post").child(post_id).child("Comment").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                list.clear();
                 for(DataSnapshot sn : snapshot.getChildren()) {
                     Comment comment = sn.getValue(Comment.class);
                     list.add(comment);
@@ -103,14 +104,13 @@ public class CommentFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String text=ed_send.getText().toString();
-                String id = PreferenceManager.getUserId(view.getContext());
+                String send_id = PreferenceManager.getUserId(view.getContext());
 
-                Comment newcmt = new Comment(id,text);
+                Comment newcmt = new Comment(send_id,text);
 
                 db.child("Users").child(user_id).child("post").child(post_id).child("Comment").push().setValue(newcmt);
 
                 //댓글 시 알림
-                String comment_id=db.child("Users").child(user_id).child("post").child(post_id).child("Comment").getKey();
 
                 db.child("Users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -121,8 +121,9 @@ public class CommentFragment extends Fragment {
                         Runnable runnable=new Runnable() {
                             @Override
                             public void run() {
+
                                 APIService apiService= Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
-                                apiService.sendNotification(new NotificationData(new SendData(text,post_id,user_id),item.getToken()))
+                                apiService.sendNotification(new NotificationData(new SendData(post_id,user_id,send_id),item.getToken()))
                                 .enqueue(new Callback<MyResponse>() {
                                     @Override
                                     public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {

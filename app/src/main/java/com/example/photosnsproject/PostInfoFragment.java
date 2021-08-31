@@ -204,51 +204,55 @@ public class PostInfoFragment extends Fragment {
                 }
 
 
-                for (int i = 0; i < friendlist.size(); i++) {
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    layoutParams.leftMargin = 30;
+                try {
+                    for (int i = 0; i < friendlist.size(); i++) {
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        layoutParams.leftMargin = 30;
 
-                    TextView tv_tag = new TextView(context);
-                    tv_tag.setTextColor(Color.parseColor("#476600"));
-                    tv_tag.setTextSize(14);
+                        TextView tv_tag = new TextView(context);
+                        tv_tag.setTextColor(Color.parseColor("#476600"));
+                        tv_tag.setTextSize(14);
 
-                    tv_tag.setLayoutParams(layoutParams);
-                    tv_tag.setTypeface(null, Typeface.BOLD);
-                    tv_tag.setClickable(true);
-
-
-                    String friend_id = friendlist.get(i);
-
-                    db.child("Users").child(friend_id).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            User user = snapshot.getValue(User.class);
-                            String friend_name=user.getNick();
-
-                            tv_tag.setText("@ " + friend_name);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
+                        tv_tag.setLayoutParams(layoutParams);
+                        tv_tag.setTypeface(null, Typeface.BOLD);
+                        tv_tag.setClickable(true);
 
 
-                    tv_tag.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ProfileFragment profileFragment = new ProfileFragment();
-                            Bundle bundle = new Bundle(1);
-                            bundle.putString("id",friend_id);
-                            profileFragment.setArguments(bundle);
-                            ((MainActivity)context).follow(profileFragment);
-                        }
-                    });
+                        String friend_id = friendlist.get(i);
+
+                        db.child("Users").child(friend_id).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                User user = snapshot.getValue(User.class);
+                                String friend_name = user.getNick();
+
+                                tv_tag.setText("@ " + friend_name);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+
+                        });
 
 
+                        tv_tag.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ProfileFragment profileFragment = new ProfileFragment();
+                                Bundle bundle = new Bundle(1);
+                                bundle.putString("id", friend_id);
+                                profileFragment.setArguments(bundle);
+                                ((MainActivity) context).follow(profileFragment);
+                            }
+                        });
 
-                    ll_tag.addView(tv_tag);
+
+                        ll_tag.addView(tv_tag);
+                    }
+                }catch (NullPointerException e){
+
                 }
             }
 

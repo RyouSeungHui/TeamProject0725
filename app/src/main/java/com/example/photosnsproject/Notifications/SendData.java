@@ -2,22 +2,17 @@ package com.example.photosnsproject.Notifications;
 
 public class SendData {
 
-    private String text;
+
     private String post_id;
     private String user_id;
+    private String send_id;
 
-    public SendData(String text, String post_id, String user_id) {
-        this.text = text;
+
+    public SendData(String post_id, String user_id, String send_id) {
+
         this.post_id = post_id;
         this.user_id = user_id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
+        this.send_id = send_id;
     }
 
     public String getPost_id() {
@@ -34,5 +29,13 @@ public class SendData {
 
     public void setUser_id(String user_id) {
         this.user_id = user_id;
+    }
+
+    public String getSend_id() {
+        return send_id;
+    }
+
+    public void setSend_id(String send_id) {
+        this.send_id = send_id;
     }
 }
