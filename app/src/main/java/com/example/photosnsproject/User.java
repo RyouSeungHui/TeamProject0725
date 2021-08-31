@@ -2,26 +2,18 @@ package com.example.photosnsproject;
 
 public class User {
 
-    private String id, password,nick;
+    private String id, password,nick,token;
 
     public User(){
 
     }
 
-    public String getNick() {
-        return nick;
-    }
 
-
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    public User(String id, String password, String nick) {
+    public User(String id, String password, String nick, String token) {
         this.id = id;
         this.password = password;
         this.nick = nick;
-
+        this.token = token;
     }
 
     public String getId() {
@@ -40,4 +32,19 @@ public class User {
         this.password = password;
     }
 
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
