@@ -4,15 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,9 +27,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class FriendsFragment extends Fragment {
+public class FriendsFragment extends Fragment implements View.OnClickListener {
+    private static final int RESULT_OK = -1;
     private View view;
     private Context context;
+    private TextView search_nick;
+    private FriendsFragment friendsFragment;
 
     private ArrayList<PostItem> posting;
     private ArrayList<String> postname;
@@ -36,6 +44,11 @@ public class FriendsFragment extends Fragment {
 
     private FirebaseDatabase database;
     private DatabaseReference db;
+
+    private ProfileFragment profileFragment;
+
+    private FragmentManager fragmentManager;
+    private FragmentTransaction fragmentTransaction;
 
 
     @Override
@@ -50,21 +63,25 @@ public class FriendsFragment extends Fragment {
 
     private void init() {
 
+        fragmentManager = getActivity().getSupportFragmentManager();
         posting = new ArrayList<>();
         postname = new ArrayList<>();
         postuser = new ArrayList<>();
-
-
+        profileFragment = new ProfileFragment();
         database=FirebaseDatabase.getInstance();
         db=database.getReference();
-
+        friendsFragment = new FriendsFragment();
 
         recyclerView = (view).findViewById(R.id.fr_rcv);
+        search_nick = (view).findViewById(R.id.search_nick);
+
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         adapter = new PostingAdapter(posting,context,postname,postuser);
         recyclerView.setAdapter(adapter);
+
+        search_nick.setOnClickListener(this);
 
         String user=NowUser.id;
 
@@ -133,4 +150,31 @@ public class FriendsFragment extends Fragment {
     }
 
 
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.search_nick:
+                Intent intent = new Intent(getActivity(), Search.class);
+                startActivityForResult(intent,1);
+                break;
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                String id=data.getExtras().getString("id");
+                Bundle bundle = new Bundle(1);
+                bundle.putString("id",id);
+                profileFragment.setArguments(bundle);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flFragment, profileFragment).commitAllowingStateLoss();
+            }
+        }
+
+
+    }
 }
