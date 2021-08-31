@@ -202,6 +202,8 @@ public class PostInfoFragment extends Fragment {
                     });
                     ll_hash.addView(tv_tag);
                 }
+
+
                 for (int i = 0; i < friendlist.size(); i++) {
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     layoutParams.leftMargin = 30;

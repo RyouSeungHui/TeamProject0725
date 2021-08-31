@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private MyFragment myFragment;
     private ProfileFragment profileFragment;
     private TagPostingFragment tagPostingFragment;
+    private CommentFragment commentFragment;
     private RandomFragment randomFragment;
     private PostInfoFragment postInfoFragment;
     private ViewPager viewPager;
@@ -42,7 +43,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         appCompatActivity = this;
+
         Init();
+        onNewIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if(extras!=null) {
+            String user_id = intent.getStringExtra("user_id");
+            String post_id = intent.getStringExtra("post_id");
+            Bundle bundle = new Bundle(2);
+            bundle.putString("user_id", user_id);
+            bundle.putString("post_id", post_id);
+            commentFragment.setArguments(bundle);
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.flFragment, commentFragment).commitAllowingStateLoss();
+
+
+            super.onNewIntent(intent);
+        }
     }
 
     private void Init() {
@@ -54,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         profileFragment= new ProfileFragment();
         tagPostingFragment = new TagPostingFragment();
         postInfoFragment = new PostInfoFragment();
+        commentFragment=new CommentFragment();
 
 
         fragmentTransaction = fragmentManager.beginTransaction();
