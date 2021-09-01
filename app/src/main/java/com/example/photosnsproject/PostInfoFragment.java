@@ -144,63 +144,69 @@ public class PostInfoFragment extends Fragment {
                 ArrayList<String> taglist = postitem.getTag();
                 ArrayList<String> friendlist = postitem.getFriend();
 
-                for(int i=0;i<taglist.size();i++) {
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    layoutParams.leftMargin = 30;
+                try {
+                    for (int i = 0; i < taglist.size(); i++) {
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        layoutParams.leftMargin = 30;
 
-                    TextView tv_tag = new TextView(context);
-                    tv_tag.setTextColor(Color.parseColor("#476600"));
-                    tv_tag.setTextSize(14);
-                    tv_tag.setText("# " + taglist.get(i));
-                    tv_tag.setLayoutParams(layoutParams);
-                    tv_tag.setTypeface(null, Typeface.BOLD);
+                        TextView tv_tag = new TextView(context);
+                        tv_tag.setTextColor(Color.parseColor("#476600"));
+                        tv_tag.setTextSize(14);
+                        tv_tag.setText("# " + taglist.get(i));
+                        tv_tag.setLayoutParams(layoutParams);
+                        tv_tag.setTypeface(null, Typeface.BOLD);
 
-                    tv_tag.setClickable(true);
+                        tv_tag.setClickable(true);
 
-                    String tag = taglist.get(i);
-                    tv_tag.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for (DataSnapshot sn : snapshot.getChildren()) {
-                                        User user_Adapter = sn.getValue(User.class);
-                                        String strId_Adapter = user_Adapter.getId();
-                                        db.child("Users").child(strId_Adapter).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                for (DataSnapshot sn2 : snapshot.getChildren()) {
-                                                    PostItem postitem_Adapter = sn2.getValue(PostItem.class);
+                        String tag = taglist.get(i);
+                        tv_tag.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                db.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for (DataSnapshot sn : snapshot.getChildren()) {
+                                            User user_Adapter = sn.getValue(User.class);
+                                            String strId_Adapter = user_Adapter.getId();
+                                            db.child("Users").child(strId_Adapter).child("post").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    for (DataSnapshot sn2 : snapshot.getChildren()) {
+                                                        PostItem postitem_Adapter = sn2.getValue(PostItem.class);
 
-                                                    try {
-                                                        ArrayList<String> arrTag_Adapter = postitem_Adapter.getTag();
+                                                        try {
+                                                            ArrayList<String> arrTag_Adapter = postitem_Adapter.getTag();
 
-                                                        for(int k=0;k<arrTag_Adapter.size();k++) {
-                                                            if (arrTag_Adapter.get(k).equals(tag)) {
-                                                                adding(postitem_Adapter,strId_Adapter,sn2.getKey());
-                                                                break;
+                                                            for (int k = 0; k < arrTag_Adapter.size(); k++) {
+                                                                if (arrTag_Adapter.get(k).equals(tag)) {
+                                                                    adding(postitem_Adapter, strId_Adapter, sn2.getKey());
+                                                                    break;
+                                                                }
                                                             }
+                                                        } catch (NullPointerException e) {
                                                         }
-                                                    } catch (NullPointerException e) {
                                                     }
                                                 }
-                                            }
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-                                            }
-                                        });
-                                    }
-                                    transport();
-                                }
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
 
-                                }
-                            });
-                        }
-                    });
-                    ll_hash.addView(tv_tag);
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                }
+                                            });
+                                        }
+                                        transport();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        });
+                        ll_hash.addView(tv_tag);
+                    }
+                }catch (NullPointerException e){
+
                 }
 
 

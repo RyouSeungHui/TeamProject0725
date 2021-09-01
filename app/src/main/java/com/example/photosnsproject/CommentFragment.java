@@ -124,9 +124,9 @@ public class CommentFragment extends Fragment {
 
                                 APIService apiService= Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
                                 apiService.sendNotification(new NotificationData(new SendData(post_id,user_id,send_id),item.getToken()))
-                                .enqueue(new Callback<MyResponse>() {
-                                    @Override
-                                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    .enqueue(new Callback<MyResponse>() {
+                                        @Override
+                                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                         if(response.code()==200){
                                             if(response.body().success==1){
                                                 Log.e("Notification", "success");
