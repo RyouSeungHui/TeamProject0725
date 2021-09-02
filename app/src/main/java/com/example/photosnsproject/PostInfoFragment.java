@@ -21,6 +21,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.photosnsproject.Notifications.APIService;
+import com.example.photosnsproject.Notifications.Client;
+import com.example.photosnsproject.Notifications.MyResponse;
+import com.example.photosnsproject.Notifications.NotificationData;
+import com.example.photosnsproject.Notifications.SendData;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -34,6 +39,10 @@ import com.google.firebase.storage.StorageReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PostInfoFragment extends Fragment {
     private View view;
@@ -290,6 +299,8 @@ public class PostInfoFragment extends Fragment {
 
         //좋아요 버튼 click
         heart.setOnClickListener(v -> {
+
+
             if(like){ //현재 좋아요
                 db.child("Users").child(user_id).child("post").child(post_id).child("like").child(myID).removeValue();
                 heart.setImageResource(R.drawable.empty_favorite);
@@ -304,6 +315,50 @@ public class PostInfoFragment extends Fragment {
                 likeNum++;
                 tvLike.setText(likeNum+"명이 이 글을 좋아합니다");
                 like=true;
+
+                db.child("Users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    String send_id = PreferenceManager.getUserId(view.getContext());
+
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        final User item=snapshot.getValue(User.class);
+
+                        Runnable runnable=new Runnable() {
+                            @Override
+                            public void run() {
+
+                                APIService apiService= Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+                                apiService.sendNotification(new NotificationData(new SendData(post_id,user_id,send_id,"2"),item.getToken()))
+                                        .enqueue(new Callback<MyResponse>() {
+                                            @Override
+                                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                                if(response.code()==200){
+                                                    if(response.body().success==1){
+                                                        Log.e("Notification", "success");
+                                                    }
+                                                }
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                            }
+                                        });
+
+                            }
+                        };
+                        Thread tr = new Thread(runnable);
+                        tr.start();
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 

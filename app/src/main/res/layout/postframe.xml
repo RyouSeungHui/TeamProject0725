@@ -40,15 +40,15 @@
 
     <ImageView
         android:id="@+id/fr_post_img"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="15dp"
         android:layout_width="wrap_content"
         android:layout_height="350dp"
         android:layout_gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="15dp"
         android:adjustViewBounds="true"
         android:clickable="true"
-        android:src="@drawable/ic_launcher_foreground"/>
+        android:src="@drawable/ic_launcher_foreground" />
 
     <LinearLayout
         android:layout_width="match_parent"

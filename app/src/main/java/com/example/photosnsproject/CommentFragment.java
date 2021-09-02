@@ -123,7 +123,7 @@ public class CommentFragment extends Fragment {
                             public void run() {
 
                                 APIService apiService= Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
-                                apiService.sendNotification(new NotificationData(new SendData(post_id,user_id,send_id),item.getToken()))
+                                apiService.sendNotification(new NotificationData(new SendData(post_id,user_id,send_id, "1"),item.getToken()))
                                     .enqueue(new Callback<MyResponse>() {
                                         @Override
                                         public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {

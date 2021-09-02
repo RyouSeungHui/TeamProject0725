@@ -54,12 +54,26 @@ public class MainActivity extends AppCompatActivity {
         if(extras!=null) {
             String user_id = intent.getStringExtra("user_id");
             String post_id = intent.getStringExtra("post_id");
+            String flag=intent.getStringExtra("flag");
             Bundle bundle = new Bundle(2);
             bundle.putString("user_id", user_id);
             bundle.putString("post_id", post_id);
-            commentFragment.setArguments(bundle);
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.flFragment, commentFragment).commitAllowingStateLoss();
+
+            if(flag.equals("1")) {
+                commentFragment.setArguments(bundle);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flFragment, commentFragment).commitAllowingStateLoss();
+            }
+            else if(flag.equals("2")){
+                postInfoFragment.setArguments(bundle);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flFragment, postInfoFragment).commitAllowingStateLoss();
+            }
+            else if(flag.equals("3")){
+                postInfoFragment.setArguments(bundle);
+                fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flFragment, postInfoFragment).commitAllowingStateLoss();
+            }
 
 
             super.onNewIntent(intent);

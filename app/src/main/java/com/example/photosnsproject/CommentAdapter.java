@@ -65,7 +65,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
             }
         });
-        db.child("Users").child(list.get(position).getUserid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        db.child("Users");
+        db.child(list.get(position).getUserid());
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);

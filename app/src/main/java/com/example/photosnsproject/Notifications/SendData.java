@@ -6,13 +6,15 @@ public class SendData {
     private String post_id;
     private String user_id;
     private String send_id;
+    private String flag;
 
 
-    public SendData(String post_id, String user_id, String send_id) {
+    public SendData(String post_id, String user_id, String send_id, String flag) {
 
         this.post_id = post_id;
         this.user_id = user_id;
         this.send_id = send_id;
+        this.flag=flag;
     }
 
     public String getPost_id() {
@@ -37,5 +39,13 @@ public class SendData {
 
     public void setSend_id(String send_id) {
         this.send_id = send_id;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
     }
 }
