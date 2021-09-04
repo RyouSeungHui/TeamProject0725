@@ -94,7 +94,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     case "3":
                         PostInfoFragment postInfoFragment3 = new PostInfoFragment();
                         Bundle bundle3 = new Bundle();
-                        bundle3.putString("user_id",notification_itemArrayList.get(position).getUser_id());
+                        bundle3.putString("user_id",notification_itemArrayList.get(position).getSend_id());
                         bundle3.putString("post_id",notification_itemArrayList.get(position).getPost_id());
                         postInfoFragment3.setArguments(bundle3);
                         ((MainActivity)context).follow(postInfoFragment3);
@@ -176,20 +176,53 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         });
 
         //게시물
-        StorageReference post_ref=storageReference.child(notification_itemArrayList.get(position).getUser_id())
-                .child(notification_itemArrayList.get(position).getPost_id());
+        switch (notification_itemArrayList.get(position).getType()) {
+            case "1":
+            StorageReference post_ref = storageReference.child(notification_itemArrayList.get(position).getUser_id())
+                    .child(notification_itemArrayList.get(position).getPost_id());
 
-        post_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Glide.with(context).load(uri).into(holder.notification_post);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+            post_ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Glide.with(context).load(uri).into(holder.notification_post);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
 
-            }
-        });
+                }
+            });
+            case "2":
+                StorageReference post_ref2 = storageReference.child(notification_itemArrayList.get(position).getUser_id())
+                        .child(notification_itemArrayList.get(position).getPost_id());
+
+                post_ref2.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(context).load(uri).into(holder.notification_post);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            case "3":
+                StorageReference post_ref3 = storageReference.child(notification_itemArrayList.get(position).getSend_id())
+                        .child(notification_itemArrayList.get(position).getPost_id());
+
+                post_ref3.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Glide.with(context).load(uri).into(holder.notification_post);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+        }
 
         holder.notification_post.setOnClickListener(new View.OnClickListener() {
             @Override
