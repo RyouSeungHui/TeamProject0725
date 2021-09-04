@@ -90,6 +90,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                         postInfoFragment.setArguments(bundle2);
                         ((MainActivity)context).follow(postInfoFragment);
                         break;
+
+                    case "3":
+                        PostInfoFragment postInfoFragment3 = new PostInfoFragment();
+                        Bundle bundle3 = new Bundle();
+                        bundle3.putString("user_id",notification_itemArrayList.get(position).getUser_id());
+                        bundle3.putString("post_id",notification_itemArrayList.get(position).getPost_id());
+                        postInfoFragment3.setArguments(bundle3);
+                        ((MainActivity)context).follow(postInfoFragment3);
+                        break;
+
                 }
 
             }
@@ -213,6 +223,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 sb2.setSpan(new StyleSpan(Typeface.BOLD), 0, notification_itemArrayList.get(position).getSend_id().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 holder.notification_content.setText(sb2);
                 break;
+
+            case "3":
+                SpannableStringBuilder sb3 = new SpannableStringBuilder();
+                String str3 = notification_itemArrayList.get(position).getSend_id() +
+                        "님이 회원님을 언급했습니다.";
+                sb3.append(str3);
+                sb3.setSpan(new StyleSpan(Typeface.BOLD), 0, notification_itemArrayList.get(position).getSend_id().length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.notification_content.setText(sb3);
+                break;
+
         }
 
         //시간

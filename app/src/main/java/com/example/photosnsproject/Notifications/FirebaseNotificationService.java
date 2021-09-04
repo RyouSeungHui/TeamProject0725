@@ -111,7 +111,7 @@ public class FirebaseNotificationService extends FirebaseMessagingService {
                     notificationBuilder =
                             new NotificationCompat.Builder(getApplicationContext(), channelId)
                                     .setSmallIcon(R.mipmap.ic_launcher)
-                                    .setContentTitle(send_id + "님이 태그를 했습니다.")
+                                    .setContentTitle(send_id + "님이 회원님을 언급했습니다")
                                     .setAutoCancel(true)
                                     .setSound(defaultUri)
                                     .setContentIntent(pendingIntent);
