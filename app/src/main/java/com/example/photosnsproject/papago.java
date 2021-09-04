@@ -16,7 +16,7 @@ public class papago {
         String clientPw = "Ld2lUhiRsd";
         try {
             String wordSource, wordTarget;
-            String text = URLEncoder.encode(word, "UTF-8");             //word
+            String text = URLEncoder.encode(word, "UTF-8");
             wordSource = URLEncoder.encode(source, "UTF-8");
             wordTarget = URLEncoder.encode(target, "UTF-8");
 
