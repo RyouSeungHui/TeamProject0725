@@ -32,7 +32,9 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
     private View view;
     private Context context;
     private TextView search_nick;
+    private Button notification_btn;
     private FriendsFragment friendsFragment;
+    private String user;
 
     private ArrayList<PostItem> posting;
     private ArrayList<String> postname;
@@ -74,6 +76,7 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
 
         recyclerView = (view).findViewById(R.id.fr_rcv);
         search_nick = (view).findViewById(R.id.search_nick);
+        notification_btn=(view).findViewById(R.id.notification_btn);
 
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(context);
@@ -82,8 +85,9 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
         recyclerView.setAdapter(adapter);
 
         search_nick.setOnClickListener(this);
+        notification_btn.setOnClickListener(this);
 
-        String user=NowUser.id;
+        user=NowUser.id;
 
         db.child("Follow").child("Following").child(user).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -157,6 +161,14 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
             case R.id.search_nick:
                 Intent intent = new Intent(getActivity(), Search.class);
                 startActivityForResult(intent,1);
+                break;
+
+            case R.id.notification_btn:
+                NotificationFragment notificationFragment = new NotificationFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("user_id",user);
+                notificationFragment.setArguments(bundle);
+                ((MainActivity)context).follow(notificationFragment);
                 break;
         }
     }

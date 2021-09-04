@@ -1,7 +1,6 @@
 package com.example.photosnsproject;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -13,19 +12,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.example.photosnsproject.Notifications.APIService;
-import com.example.photosnsproject.Notifications.Client;
-import com.example.photosnsproject.Notifications.MyResponse;
-import com.example.photosnsproject.Notifications.NotificationData;
-import com.example.photosnsproject.Notifications.SendData;
+import com.example.photosnsproject.Alarm.APIService;
+import com.example.photosnsproject.Alarm.Client;
+import com.example.photosnsproject.Alarm.MyResponse;
+import com.example.photosnsproject.Alarm.NotificationData;
+import com.example.photosnsproject.Alarm.SendData;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -316,9 +313,16 @@ public class PostInfoFragment extends Fragment {
                 tvLike.setText(likeNum+"명이 이 글을 좋아합니다");
                 like=true;
 
+                //댓글 시 알림창 저장
+                DatabaseReference notification_ref= database.getReference("Alarm").child(user_id).push();
+                String alarm_id=notification_ref.getKey();
+                String send_id = PreferenceManager.getUserId(view.getContext());
+                Notification_Item notification_item=new Notification_Item(null,send_id,post_id,user_id,alarm_id,getTime(),"2");
+                notification_ref.setValue(notification_item);
+
                 db.child("Users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
 
-                    String send_id = PreferenceManager.getUserId(view.getContext());
+
 
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -415,5 +419,14 @@ public class PostInfoFragment extends Fragment {
     public void adding(PostItem postitem_Adapter,String strId_Adapter,String postkey) {
         userlistfortag.add(strId_Adapter);
         postlistfortag.add(postkey);
+    }
+
+    private String getTime() {
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        String getTime = dateFormat.format(date);
+
+        return getTime;
     }
 }

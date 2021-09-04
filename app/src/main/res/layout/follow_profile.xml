@@ -17,8 +17,7 @@
         android:id="@+id/followlist_profile"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_gravity="center"
-        android:background="@mipmap/ic_launcher"/>
+        android:layout_gravity="center" />
     </LinearLayout>
     
     <LinearLayout

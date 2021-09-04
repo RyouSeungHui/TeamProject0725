@@ -15,19 +15,20 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.photosnsproject.Notifications.APIService;
-import com.example.photosnsproject.Notifications.Client;
-import com.example.photosnsproject.Notifications.MyResponse;
-import com.example.photosnsproject.Notifications.NotificationData;
-import com.example.photosnsproject.Notifications.SendData;
-import com.example.photosnsproject.Notifications.Token;
+import com.example.photosnsproject.Alarm.APIService;
+import com.example.photosnsproject.Alarm.Client;
+import com.example.photosnsproject.Alarm.MyResponse;
+import com.example.photosnsproject.Alarm.NotificationData;
+import com.example.photosnsproject.Alarm.SendData;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -110,6 +111,14 @@ public class CommentFragment extends Fragment {
 
                 db.child("Users").child(user_id).child("post").child(post_id).child("Comment").push().setValue(newcmt);
 
+                //댓글 시 알림창 저장
+                DatabaseReference notification_ref= database.getReference("Alarm").child(user_id).push();
+                String alarm_id=notification_ref.getKey();
+                Notification_Item notification_item=new Notification_Item(text,send_id,post_id,user_id,alarm_id,getTime(),"1");
+                notification_ref.setValue(notification_item);
+
+
+
                 //댓글 시 알림
 
                 db.child("Users").child(user_id).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -153,8 +162,14 @@ public class CommentFragment extends Fragment {
 
                     }
                 });
+                //알림창
+
             }
+
+
         });
+
+
 
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,5 +191,14 @@ public class CommentFragment extends Fragment {
         layoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+    }
+
+    private String getTime() {
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        String getTime = dateFormat.format(date);
+
+        return getTime;
     }
 }

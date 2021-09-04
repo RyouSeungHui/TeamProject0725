@@ -1,4 +1,4 @@
-package com.example.photosnsproject.Notifications;
+package com.example.photosnsproject.Alarm;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

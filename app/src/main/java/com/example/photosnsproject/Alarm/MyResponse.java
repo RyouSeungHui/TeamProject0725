@@ -1,4 +1,4 @@
-package com.example.photosnsproject.Notifications;
+package com.example.photosnsproject.Alarm;
 
 public class MyResponse {
     public int success;

@@ -1,4 +1,4 @@
-package com.example.photosnsproject.Notifications;
+package com.example.photosnsproject.Alarm;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -15,14 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.example.photosnsproject.MainActivity;
-import com.example.photosnsproject.PostInfoFragment;
 import com.example.photosnsproject.PreferenceManager;
 import com.example.photosnsproject.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

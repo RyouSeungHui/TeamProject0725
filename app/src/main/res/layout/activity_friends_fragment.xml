@@ -15,13 +15,24 @@
 
         <TextView
             android:id="@+id/search_nick"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="25sp"
             android:textColor="@color/black"
             android:text="닉네임 검색"
             android:clickable="true"/>
+
+
+        <Button
+            android:id="@+id/notification_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:gravity="center"
+            android:clickable="true"
+            android:text="알림창"/>
+
 
     </LinearLayout>
 
