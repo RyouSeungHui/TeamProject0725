@@ -1,4 +1,4 @@
-package com.example.photosnsproject.Alarm;
+package com.example.photosnsproject.Notifications;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

@@ -15,11 +15,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.photosnsproject.Alarm.APIService;
-import com.example.photosnsproject.Alarm.Client;
-import com.example.photosnsproject.Alarm.MyResponse;
-import com.example.photosnsproject.Alarm.NotificationData;
-import com.example.photosnsproject.Alarm.SendData;
+import com.example.photosnsproject.Notifications.APIService;
+import com.example.photosnsproject.Notifications.Client;
+import com.example.photosnsproject.Notifications.MyResponse;
+import com.example.photosnsproject.Notifications.NotificationData;
+import com.example.photosnsproject.Notifications.SendData;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

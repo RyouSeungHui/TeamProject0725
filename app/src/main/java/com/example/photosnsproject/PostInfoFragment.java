@@ -18,11 +18,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.example.photosnsproject.Alarm.APIService;
-import com.example.photosnsproject.Alarm.Client;
-import com.example.photosnsproject.Alarm.MyResponse;
-import com.example.photosnsproject.Alarm.NotificationData;
-import com.example.photosnsproject.Alarm.SendData;
+import com.example.photosnsproject.Notifications.APIService;
+import com.example.photosnsproject.Notifications.Client;
+import com.example.photosnsproject.Notifications.MyResponse;
+import com.example.photosnsproject.Notifications.NotificationData;
+import com.example.photosnsproject.Notifications.SendData;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;

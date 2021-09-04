@@ -1,4 +1,4 @@
-package com.example.photosnsproject.Alarm;
+package com.example.photosnsproject.Notifications;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

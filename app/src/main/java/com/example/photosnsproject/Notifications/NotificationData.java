@@ -1,4 +1,4 @@
-package com.example.photosnsproject.Alarm;
+package com.example.photosnsproject.Notifications;
 
 public class NotificationData {
     public SendData data;
