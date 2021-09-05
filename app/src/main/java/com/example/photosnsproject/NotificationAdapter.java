@@ -227,12 +227,36 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.notification_post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PostInfoFragment postInfoFragment = new PostInfoFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("user_id",notification_itemArrayList.get(position).getUser_id());
-                bundle.putString("post_id",notification_itemArrayList.get(position).getPost_id());
-                postInfoFragment.setArguments(bundle);
-                ((MainActivity)context).follow(postInfoFragment);
+
+                switch (notification_itemArrayList.get(position).getType()) {
+                    case "1":
+                        PostInfoFragment postInfoFragment = new PostInfoFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("user_id",notification_itemArrayList.get(position).getUser_id());
+                        bundle.putString("post_id",notification_itemArrayList.get(position).getPost_id());
+                        postInfoFragment.setArguments(bundle);
+                        ((MainActivity)context).follow(postInfoFragment);
+                        break;
+
+                    case "2":
+                        PostInfoFragment postInfoFragment2 = new PostInfoFragment();
+                        Bundle bundle2 = new Bundle();
+                        bundle2.putString("user_id",notification_itemArrayList.get(position).getUser_id());
+                        bundle2.putString("post_id",notification_itemArrayList.get(position).getPost_id());
+                        postInfoFragment2.setArguments(bundle2);
+                        ((MainActivity)context).follow(postInfoFragment2);
+                        break;
+
+                    case "3":
+                        PostInfoFragment postInfoFragment3 = new PostInfoFragment();
+                        Bundle bundle3 = new Bundle();
+                        bundle3.putString("user_id",notification_itemArrayList.get(position).getSend_id());
+                        bundle3.putString("post_id",notification_itemArrayList.get(position).getPost_id());
+                        postInfoFragment3.setArguments(bundle3);
+                        ((MainActivity)context).follow(postInfoFragment3);
+                        break;
+
+                }
 
             }
         });
