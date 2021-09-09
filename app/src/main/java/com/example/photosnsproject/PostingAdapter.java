@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -75,7 +76,31 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
     @Override
     public void onBindViewHolder(@NonNull PostingAdapter.postviewholder holder, int position) {
 
+        db.child("Users").child(postuser.get(position)).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                holder.user_name.setText(user.getId());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         holder.user_name.setText(postuser.get(position));
+
+        holder.user_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFragment profileFragment = new ProfileFragment();
+                Bundle bundle = new Bundle(1);
+                bundle.putString("id",postuser.get(position));
+                profileFragment.setArguments(bundle);
+                ((MainActivity)context).follow(profileFragment);
+            }
+        });
 
 
         Calendar posttime = Calendar.getInstance();
@@ -139,6 +164,8 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
             }
         });
 
+
+
         holder.post_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,6 +178,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
 
             }
         });
+
 
         String user_path = "profile/"+postuser.get(position)+".png";
         submitProfile = storageReference.child(user_path);
@@ -168,6 +196,17 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
             }
         });
 
+        holder.user_img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFragment profileFragment = new ProfileFragment();
+                Bundle bundle = new Bundle(1);
+                bundle.putString("id",postuser.get(position));
+                profileFragment.setArguments(bundle);
+                ((MainActivity)context).follow(profileFragment);
+            }
+        });
+
         try {
             for (int i = 0; i < posting.get(position).getTag().size(); i++) {
 
@@ -175,7 +214,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 layoutParams.leftMargin = 30;
 
                 TextView tv_tag = new TextView(context);
-                tv_tag.setTextColor(Color.parseColor("#476600"));
+                tv_tag.setTextColor(Color.parseColor("#00093C"));
                 tv_tag.setTextSize(14);
                 tv_tag.setText("# " + posting.get(position).getTag().get(i));
                 tv_tag.setLayoutParams(layoutParams);
@@ -238,13 +277,12 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
                 layoutParams.leftMargin = 30;
 
                 TextView tv_tag = new TextView(context);
-                tv_tag.setTextColor(Color.parseColor("#476600"));
+                tv_tag.setTextColor(Color.parseColor("#00093C"));
                 tv_tag.setTextSize(14);
 
                 tv_tag.setLayoutParams(layoutParams);
                 tv_tag.setTypeface(null, Typeface.BOLD);
                 tv_tag.setClickable(true);
-
 
 
 
@@ -284,6 +322,22 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
         } catch(NullPointerException e) {
 
         }
+        GradientDrawable drawable = (GradientDrawable) context.getDrawable(R.drawable.imageview_round);
+        holder.post_img.setBackground(drawable);
+        holder.post_img.setClipToOutline(true);
+
+        db.child("Users").child(postuser.get(position)).child("post").child(postname.get(position)).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild("like")){ //좋아요 있을때
+                    long likeNum = snapshot.child("like").getChildrenCount();
+                    holder.like.setText("♥ "+likeNum);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
     }
 
@@ -302,6 +356,8 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
         TextView mention;
         LinearLayout ll_friend;
 
+        TextView like;
+
 
         public postviewholder(@NonNull View itemView) {
             super(itemView);
@@ -312,6 +368,11 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.postview
             this.ll_tag=itemView.findViewById(R.id.ll_tag);
             this.mention=itemView.findViewById(R.id.mention);
             this.ll_friend=itemView.findViewById(R.id.ll_friend);
+            this.like=itemView.findViewById(R.id.like);
+
+            GradientDrawable drawable = (GradientDrawable) context.getDrawable(R.drawable.imageview_round);
+            post_img.setBackground(drawable);
+            post_img.setClipToOutline(true);
         }
     }
 

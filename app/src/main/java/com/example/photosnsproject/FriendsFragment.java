@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +32,8 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
     private static final int RESULT_OK = -1;
     private View view;
     private Context context;
-    private TextView search_nick;
-    private Button notification_btn;
+    private ImageView search_nick;
+    private ImageView notification_btn;
     private FriendsFragment friendsFragment;
     private String user;
 
