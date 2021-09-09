@@ -5,6 +5,7 @@
     android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".RandomFragment">
 
     <LinearLayout
@@ -23,9 +24,12 @@
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black"
-        android:text="추천 수가 많은 게시물을 보여주는 프레그먼트입니다" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/random_rcv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+
 </LinearLayout>
